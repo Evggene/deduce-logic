@@ -6,6 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 
+import static com.sun.javafx.scene.control.skin.Utils.getResource;
+
 
 public class Tests extends Assert {
 
@@ -64,8 +66,9 @@ public class Tests extends Assert {
 
     @Test
     public void test1() {                           // валидный файл, тест на логику
-        File file = new File("functionalTests/valid.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+
+        File s = new File(getClass().getResource("valid.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("Df, S, L, H, ZZ, O, D", outContent.toString());
     }
@@ -81,16 +84,17 @@ public class Tests extends Assert {
     @Test
     public void test00() {                           // неправильный путь
 
-        Main.main(new String[]{"про"});
+        File s = new File("про");
+        Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Error when reading file: про", outContent.toString());
+        assertEquals("Error when reading file: C:\\Users\\Evgeniy.Bezlepkin\\IdeaProjects\\EvgenyDeduce\\про", outContent.toString());
     }
 
     @Test
     public void test2() {                           // пустой файл
 
-        File file = new File("functionalTests/empty_file.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("empty_file.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: missing or wrong separator", outContent.toString());
     }
@@ -98,8 +102,8 @@ public class Tests extends Assert {
     @Test
     public void test3() {                           // ошибка в правилах: правила отсутствуют
 
-        File file = new File("functionalTests/rule_error_emptyRule.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("rule_error_emptyRule.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: missing rules", outContent.toString());
     }
@@ -107,8 +111,8 @@ public class Tests extends Assert {
     @Test
     public void test4() {                           // ошибка в фактах: факты отсутствуют
 
-        File file = new File("functionalTests/facts_error_emptyFacts.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("facts_error_emptyFacts.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: missing facts or empty line", outContent.toString());
     }
@@ -116,8 +120,8 @@ public class Tests extends Assert {
     @Test
     public void test5() {                           // невалидный файл: нет разделителя
 
-        File file = new File("functionalTests/absent_separator.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("absent_separator.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: missing rules", outContent.toString());
     }
@@ -125,8 +129,8 @@ public class Tests extends Assert {
     @Test
     public void test7() {                           // ошибка в данных - неверный логический символ
 
-        File file = new File("functionalTests/rules_error.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("rules_error.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: Wrong value S|  K", outContent.toString());
     }
@@ -134,8 +138,8 @@ public class Tests extends Assert {
     @Test
     public void test8() {                           // ошибка в данных - отсутствует ->
 
-        File file = new File("functionalTests/missing_pointer.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("missing_pointer.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: missing ->", outContent.toString());
     }
@@ -143,17 +147,17 @@ public class Tests extends Assert {
     @Test
     public void test9() {                           // ошибка в данных - неправильный разделитель
 
-        File file = new File("functionalTests/wrong_separator.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("wrong_separator.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing ->", outContent.toString());
+        assertEquals("File does not valid: missing or wrong separator", outContent.toString());
     }
 
     @Test
     public void test10() {                           // ошибка в данных - перепутаны правила и факты
 
-        File file = new File("functionalTests/wrong_rules_facts.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("wrong_rules_facts.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: Wrong value Df || Yg && jhkl->ZZ", outContent.toString());
     }
@@ -161,8 +165,8 @@ public class Tests extends Assert {
     @Test
     public void test11() {                           // ошибка в правилах - пустая линия
 
-        File file = new File("functionalTests/missing_Line_rules.txt");
-        Main.main(new String[]{file.getAbsolutePath()});
+        File s = new File(getClass().getResource("missing_Line_rules.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("File does not valid: missing rules", outContent.toString());
     }

@@ -14,7 +14,7 @@ public class Model {
     }
 
 
-    public void deduce() {
+    public List deduce() {
         int change = 0;
         for (int i = 0; i < rulesList.size(); i++) {
             for (int j = 0; j < rulesList.size() - i; j++) {
@@ -29,6 +29,7 @@ public class Model {
                 change = resultList.size();
             }
         }
+        return resultList;
     }
 
 

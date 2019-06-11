@@ -10,17 +10,18 @@ public class Main {
 
     public static void main(String[] args) {
 
-        List<List<String>> rulesList = new ArrayList<>();
-        List<String> factsList = new ArrayList<>();
-
         if (args == null || args.length == 0) {
             System.out.print("Missing argument");
             return;
         }
 
-        Parser parser = new Parser(rulesList, factsList);
+
+        Parser parser = new Parser();
+        Model model = null;
+
+
         try {
-            parser.parse(args[0]);
+            model = parser.parse(args[0]);
         } catch (FileNotFoundException e) {
             System.out.print("Wrong argument: file not found");
             return;
@@ -34,19 +35,19 @@ public class Main {
             e.printStackTrace();
         }
 
-        Model model = new Model(rulesList, factsList);
-        model.deduce();
 
-
-        StringBuilder resultList = new StringBuilder();
-        for (int i = 0; i < factsList.size(); i++) {
-            if (i < factsList.size() - 1) {
-                resultList.append(factsList.get(i)).append(", ");
+        List resultsList = model.deduce();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < resultsList.size(); i++) {
+            if (i < resultsList.size() - 1) {
+                sb.append(resultsList.get(i)).append(", ");
             } else {
-                resultList.append(factsList.get(i));
+                sb.append(resultsList.get(i));
             }
         }
-        System.out.print(resultList);
+        System.out.print(sb);
+
+        Main m = new Main();
 
 
     }

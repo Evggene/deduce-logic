@@ -7,16 +7,11 @@ import java.util.*;
 
 
 public class Parser {
-    private List<List<String>> rulesList;
-    private List<String> resultList;
+    private List<List<String>> rulesList = new ArrayList<>();
+    private List<String> resultList = new ArrayList<>();
 
 
-    public Parser(List<List<String>> rulesList, List<String> resultList) {
-        this.rulesList = rulesList;
-        this.resultList = resultList;
-    }
-
-    public void parse(String path) throws Exception {
+    public Model parse(String path) throws Exception {
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get(path), Charset.forName("UTF-8"))) {
             String separator = "----------------------------------------------------------------";
@@ -44,6 +39,7 @@ public class Parser {
             throw new ParserException("missing rules");
         }
 
+        return new Model(rulesList, resultList);
     }
 
 
