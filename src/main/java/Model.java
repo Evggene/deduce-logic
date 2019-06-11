@@ -3,11 +3,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Deduction {
+public class Model {
+    private List<List<String>> rulesList;
+    private List<String> resultList;
 
 
+    public Model(List<List<String>> rulesList, List<String> resultList) {
+        this.rulesList = rulesList;
+        this.resultList = resultList;
+    }
 
-    void deduceFacts(List<String> valuesRules, List<String> resultList) {
+
+    public void deduce() {
+        int change = 0;
+        for (int i = 0; i < rulesList.size(); i++) {
+            for (int j = 0; j < rulesList.size() - i; j++) {
+                ArrayList al = new ArrayList(rulesList.get(j));
+                if (!resultList.contains(al.get(al.size() - 1))) {
+                    deduce(al);
+                }
+            }
+            if (change == resultList.size()) {
+                break;
+            } else {
+                change = resultList.size();
+            }
+        }
+    }
+
+
+    private void deduce(List<String> valuesRules) {
 
         boolean currentOperation = false;
 
