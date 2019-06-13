@@ -46,29 +46,29 @@ public class Parser {
     private List<String> parseFactsLine(String factsLine) throws ParserException {
 
         if (factsLine == null || factsLine.length() == 0) {
-            throw new ParserException("missing facts or empty line");
+            throw new ParserException("missing facts");
         }
 
-        String[] knownFactLine = factsLine.trim().split(",");
+        String[] knowingFactsLine = factsLine.trim().split(",");
 
-        for (int k = 0; k < knownFactLine.length; k++) {
-            knownFactLine[k] = knownFactLine[k].trim();
+        for (int k = 0; k < knowingFactsLine.length; k++) {
+            knowingFactsLine[k] = knowingFactsLine[k].trim();
         }
-        return Arrays.asList(knownFactLine);
+        return Arrays.asList(knowingFactsLine);
     }
 
 
-    private List parseRulesLine(String s) throws ParserException {
+    private List parseRulesLine(String ruleLine) throws ParserException {
 
         List<String> ruleLineList = new ArrayList<>();
 
-        if (s.length() == 0) {
+        if (ruleLine.length() == 0) {
             throw new ParserException("missing rules");
         }
-        if (!s.contains("->")) {
+        if (!ruleLine.contains("->")) {
             throw new ParserException("missing ->");
         }
-        String[] split = s.split("((?<=&{2})|(?=&{2})|(?<=\\|{2})|(?=\\|{2})|(?<=->)|(?=->))");
+        String[] split = ruleLine.split("((?<=&{2})|(?=&{2})|(?<=\\|{2})|(?=\\|{2})|(?<=->)|(?=->))");
         for (int i = 0; i < split.length; i++) {
             ruleLineList.add(split[i].trim());
         }
@@ -79,32 +79,30 @@ public class Parser {
     List<String> validateLine(List<String> line) throws ParserException {
 
         for (int i = 0; i < line.size(); i++) {
-            if (line.get(i).equals("||") || line.get(i).equals("&&") || line.get(i).equals("->")) {
-            } else {
+            if (line.get(i).equals("||") || line.get(i).equals("&&") || line.get(i).equals("->"))
+                continue;
 
-                boolean check = false;
-
-                if (!Character.isLetter(line.get(i).charAt(0)) && !(line.get(i).charAt(0) == '_')
-                        || line.get(i).length() == 1 && !Character.isLetter(line.get(i).charAt(0))) {
-                    check = true;
-                }
-
-                for (int j = 1; j < line.get(i).length(); j++) {
-                    if (!Character.isLetterOrDigit(line.get(i).charAt(j)) && line.get(i).charAt(j) != '_') {
-                        check = true;
-                    }
-                }
-
-                boolean b = false;
-                for (int j = 0; j < line.get(i).length(); j++) {
-                    if (Character.isLetter(line.get(i).charAt(j))) {
-                        b = true;
-                    }
-                }
-                if (!b || check) throw new ParserException("Wrong value " + line.get(i));
-
+            if (!Character.isLetter(line.get(i).charAt(0)) && !(line.get(i).charAt(0) == '_')
+                    || line.get(i).length() == 1 && !Character.isLetter(line.get(i).charAt(0))) {
+                throw new ParserException("Wrong value " + line.get(i));
             }
+
+            for (int j = 1; j < line.get(i).length(); j++) {
+                if (!Character.isLetterOrDigit(line.get(i).charAt(j)) && line.get(i).charAt(j) != '_') {
+                    throw new ParserException("Wrong value " + line.get(i));
+                }
+            }
+
+            boolean b = false;
+            for (int j = 0; j < line.get(i).length(); j++) {
+                if (Character.isLetter(line.get(i).charAt(j))) {
+                    b = true;
+                }
+            }
+            if (!b)
+                throw new ParserException("Wrong value " + line.get(i));
         }
+
         return line;
     }
 }

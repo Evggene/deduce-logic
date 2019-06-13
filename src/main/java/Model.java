@@ -20,7 +20,7 @@ public class Model {
             for (int j = 0; j < rulesList.size() - i; j++) {
                 ArrayList al = new ArrayList(rulesList.get(j));
                 if (!resultList.contains(al.get(al.size() - 1))) {
-                    deduce(al);
+                    deduceLine(al);
                 }
             }
             if (change == resultList.size()) {
@@ -33,7 +33,7 @@ public class Model {
     }
 
 
-    private void deduce(List<String> valuesRules) {
+    private void deduceLine(List<String> valuesRules) {
 
         boolean currentOperation = false;
 

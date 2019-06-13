@@ -1,9 +1,6 @@
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 
 public class Main {
@@ -15,9 +12,8 @@ public class Main {
             return;
         }
 
-
         Parser parser = new Parser();
-        Model model = null;
+        Model model;
 
 
         try {
@@ -29,26 +25,22 @@ public class Main {
             System.out.print("Error when reading file: " + e.getMessage());
             return;
         } catch (ParserException e) {
-            System.out.print("File does not valid: " + e.getMessage());
+            System.out.print("Invalid file: " + e.getMessage());
             return;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.print("Unknown error");
+            return;
         }
 
+        Collection<String> resultsList = model.deduce();
 
-        List resultsList = model.deduce();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < resultsList.size(); i++) {
-            if (i < resultsList.size() - 1) {
-                sb.append(resultsList.get(i)).append(", ");
-            } else {
-                sb.append(resultsList.get(i));
-            }
+        Iterator<String> i = resultsList.iterator();
+        while (i.hasNext()) {
+            sb.append(i.next());
+            if (! i.hasNext())
+                System.out.print(sb);
+            sb.append(',').append(' ');
         }
-        System.out.print(sb);
-
-        Main m = new Main();
-
-
     }
 }

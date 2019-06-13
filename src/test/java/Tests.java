@@ -5,6 +5,7 @@ import org.junit.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
 
 import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
@@ -24,13 +25,13 @@ public class Tests extends Assert {
         System.setOut(originalOut);
     }
 
-//
-//    @Test(expected = Exception.class)       // на все эти идентификаторы вылетает Exception
-//    public void testIdentificators1() throws Exception {
-//        Parser p = new Parser(new String("1"));
+
+//    @Test       // на все эти идентификаторы вылетает Exception
+//    public void testIdentificators1() throws ParserException {
+//        Parser p = new Parser();
 //        ArrayList<String> list = new ArrayList();
 //
-//        list.add("1D && F -> K");
+//        list.add("D && F -> K");
 //        p.validateLine(list);
 //        list.clear();
 //
@@ -41,7 +42,7 @@ public class Tests extends Assert {
 //        list.add("gh& && F -> K");
 //        p.validateLine(list);
 //        list.clear();
-
+//
 //        p.checkIdentificator("_");
 //        p.checkIdentificator("3");
 //        p.checkIdentificator("_|||");
@@ -87,7 +88,8 @@ public class Tests extends Assert {
         File s = new File("про");
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Error when reading file: C:\\Users\\Evgeniy.Bezlepkin\\IdeaProjects\\EvgenyDeduce\\про", outContent.toString());
+        assertEquals("Error when reading file: C:\\Users\\Evgeniy.Bezlepkin\\IdeaProjects\\EvgenyDeduce\\про"
+                , outContent.toString());
     }
 
     @Test
