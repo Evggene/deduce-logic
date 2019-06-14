@@ -98,7 +98,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("empty_file.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing or wrong separator", outContent.toString());
+        assertEquals("Invalid file: missing or wrong separator", outContent.toString());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rule_error_emptyRule.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing rules", outContent.toString());
+        assertEquals("Invalid file: missing rules", outContent.toString());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("facts_error_emptyFacts.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing facts or empty line", outContent.toString());
+        assertEquals("Invalid file: missing facts", outContent.toString());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("absent_separator.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing rules", outContent.toString());
+        assertEquals("Invalid file: missing rules", outContent.toString());
     }
 
     @Test
@@ -134,7 +134,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rules_error.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: Wrong value S|  K", outContent.toString());
+        assertEquals("Invalid file: Wrong value S|  K", outContent.toString());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("missing_pointer.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing ->", outContent.toString());
+        assertEquals("Invalid file: missing ->", outContent.toString());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("wrong_separator.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing or wrong separator", outContent.toString());
+        assertEquals("Invalid file: missing ->", outContent.toString());
     }
 
     @Test
@@ -161,7 +161,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("wrong_rules_facts.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: Wrong value Df || Yg && jhkl->ZZ", outContent.toString());
+        assertEquals("Invalid file: Wrong value Df || Yg && jhkl->ZZ", outContent.toString());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("missing_Line_rules.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("File does not valid: missing rules", outContent.toString());
+        assertEquals("Invalid file: missing rules", outContent.toString());
     }
 
 }

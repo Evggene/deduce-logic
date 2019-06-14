@@ -1,49 +1,14 @@
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import sun.rmi.runtime.Log;
+
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 public class Parser {
-    private List<List<String>> rulesList = new ArrayList<>();
-    private List<String> resultList = new ArrayList<>();
 
-
-    public Model parse(String path) throws Exception {
-
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(path), Charset.forName("UTF-8"))) {
-            String separator = "----------------------------------------------------------------";
-            String readLine = null;
-            boolean isSeparator = false;
-
-            while ((readLine = br.readLine()) != null) {
-                if (!readLine.startsWith("--------------------")) {
-                    rulesList.add(validateLine(parseRulesLine(readLine)));
-                } else {
-                    if (readLine.equals(separator)) {
-                        resultList.addAll(validateLine(parseFactsLine(br.readLine())));
-                        isSeparator = true;
-                        break;
-                    } else {
-                        throw new ParserException("missing or wrong separator");
-                    }
-                }
-            }
-            if (!isSeparator) {
-                throw new ParserException("missing or wrong separator");
-            }
-        }
-        if (rulesList.isEmpty()) {
-            throw new ParserException("missing rules");
-        }
-
-        return new Model(rulesList, resultList);
-    }
-
-
-    private List<String> parseFactsLine(String factsLine) throws ParserException {
+    public List<String> parseFactsLine(String factsLine) throws ParserException {
 
         if (factsLine == null || factsLine.length() == 0) {
             throw new ParserException("missing facts");
@@ -54,11 +19,11 @@ public class Parser {
         for (int k = 0; k < knowingFactsLine.length; k++) {
             knowingFactsLine[k] = knowingFactsLine[k].trim();
         }
-        return Arrays.asList(knowingFactsLine);
+        return validateLine(Arrays.asList(knowingFactsLine));
     }
 
 
-    private List parseRulesLine(String ruleLine) throws ParserException {
+    public List<String> parseRulesLine(String ruleLine) throws ParserException {
 
         List<String> ruleLineList = new ArrayList<>();
 
@@ -68,15 +33,27 @@ public class Parser {
         if (!ruleLine.contains("->")) {
             throw new ParserException("missing ->");
         }
-        String[] split = ruleLine.split("((?<=&{2})|(?=&{2})|(?<=\\|{2})|(?=\\|{2})|(?<=->)|(?=->))");
+
+        StringBuilder regex = new StringBuilder();
+        regex.append("((?<=\\|{2})|(?=\\|{2})");
+        for (int i = 0; i < LogicOperations.values().length; i++) {
+            if (LogicOperations.values()[i].operationSymbol() == "||") continue;
+            regex.append("|(?<=").append(LogicOperations.values()[i].operationSymbol()).append(")")
+                    .append("|(?=").append(LogicOperations.values()[i].operationSymbol()).append(")");
+        }
+        regex.append(")");
+
+        String[] split = ruleLine.split(regex.toString());
+
         for (int i = 0; i < split.length; i++) {
             ruleLineList.add(split[i].trim());
         }
-        return ruleLineList;
+
+        return validateLine(ruleLineList);
     }
 
 
-    List<String> validateLine(List<String> line) throws ParserException {
+    private List<String> validateLine(List<String> line) throws ParserException {
 
         for (int i = 0; i < line.size(); i++) {
             if (line.get(i).equals("||") || line.get(i).equals("&&") || line.get(i).equals("->"))

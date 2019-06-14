@@ -12,12 +12,10 @@ public class Main {
             return;
         }
 
-        Parser parser = new Parser();
         Model model;
 
-
         try {
-            model = parser.parse(args[0]);
+            model = new Reader().readAndParse(args[0], new Parser());
         } catch (FileNotFoundException e) {
             System.out.print("Wrong argument: file not found");
             return;
