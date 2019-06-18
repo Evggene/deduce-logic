@@ -1,3 +1,7 @@
+import model.Model;
+import parcer.Parser;
+import parcer.ParserException;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
@@ -15,7 +19,7 @@ public class Main {
         Model model;
 
         try {
-            model = new Reader().readAndParse(args[0], new Parser());
+            model = new Parser().parse(args[0]);
         } catch (FileNotFoundException e) {
             System.out.print("Wrong argument: file not found");
             return;
@@ -30,7 +34,10 @@ public class Main {
             return;
         }
 
-        Collection<String> resultsList = model.deduce();
+        Collection<String> resultsList = null;
+
+            resultsList = model.deduce();
+
 
         StringBuilder sb = new StringBuilder();
         Iterator<String> i = resultsList.iterator();

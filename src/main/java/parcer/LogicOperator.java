@@ -1,4 +1,6 @@
-public enum LogicOperations {
+package parcer;
+
+public enum LogicOperator {
 
     AND {
         @Override

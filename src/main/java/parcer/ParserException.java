@@ -1,3 +1,5 @@
+package parcer;
+
 public class ParserException extends Exception{
 
 

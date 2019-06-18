@@ -27,8 +27,8 @@ public class Tests extends Assert {
 
 
 //    @Test       // на все эти идентификаторы вылетает Exception
-//    public void testIdentificators1() throws ParserException {
-//        Parser p = new Parser();
+//    public void testIdentificators1() throws parcer.ParserException {
+//        parcer.Parser p = new parcer.Parser();
 //        ArrayList<String> list = new ArrayList();
 //
 //        list.add("D && F -> K");
@@ -56,7 +56,7 @@ public class Tests extends Assert {
 //
 //    @Test       // валидные идентификаторы
 //    public void testIdentificators2() throws Exception {
-//        Parser p = new Parser(listOfLogics, listOfResults);
+//        parcer.Parser p = new parcer.Parser(listOfLogics, listOfResults);
 //        p.checkIdentificator("d");   // valid
 //        p.checkIdentificator("g2h");   // valid
 //        p.checkIdentificator("g_h");   // valid
@@ -116,7 +116,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("facts_error_emptyFacts.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing facts", outContent.toString());
+        assertEquals("Invalid file: missing expressions", outContent.toString());
     }
 
     @Test
