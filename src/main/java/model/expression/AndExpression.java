@@ -1,13 +1,15 @@
 package model.expression;
 
 import java.util.Collection;
-import java.util.List;
+
 
 public class AndExpression implements Expression{
 
-    List<Expression> expressions;
+    private Collection<Expression> expressions;
 
-    public AndExpression() {
+
+    public AndExpression(Collection<Expression> expressions) {
+        this.expressions = expressions;
     }
 
     @Override
@@ -20,20 +22,10 @@ public class AndExpression implements Expression{
         return true;
     }
 
-
-//    List<String> expressions;
-//
-//    public AndExpression(List<String> expressions) {
-//        this.expressions = expressions;
-//    }
-//
-//    @Override
-//    public boolean calculate(Collection<String> knownFacts) {
-//        for (String ex : expressions) {
-//            if (knownFacts.contains(ex)) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
+    @Override
+    public String toString() {
+        return "AndExpression{" +
+                expressions +
+                '}';
+    }
 }

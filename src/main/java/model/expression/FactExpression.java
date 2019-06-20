@@ -2,9 +2,10 @@ package model.expression;
 
 import java.util.Collection;
 
+
 public class FactExpression implements Expression {
 
-    String fact;
+    private String fact;
 
     public FactExpression(String fact) {
         this.fact = fact;
@@ -13,5 +14,10 @@ public class FactExpression implements Expression {
     @Override
     public boolean calculate(Collection<String> knownFacts) {
      return knownFacts.contains(fact);
+    }
+
+    @Override
+    public String toString() {
+        return fact;
     }
 }

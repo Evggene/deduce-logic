@@ -61,7 +61,7 @@ public class Tests extends Assert {
 //        p.checkIdentificator("g2h");   // valid
 //        p.checkIdentificator("g_h");   // valid
 //        p.checkIdentificator("_gh");  // valid
-//        p.checkIdentificator("_12G");  // valid
+
 //    }
 
 
@@ -71,7 +71,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("valid.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Df, S, L, H, ZZ, O, D", outContent.toString());
+        assertEquals("Df, S, L, H, ZZ, ZZ2, O, D", outContent.toString());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("facts_error_emptyFacts.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing expressions", outContent.toString());
+        assertEquals("Invalid file: missing facts", outContent.toString());
     }
 
     @Test
@@ -125,17 +125,17 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("absent_separator.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing rules", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
     }
 
-    @Test
-    public void test7() {                           // ошибка в данных - неверный логический символ
-
-        File s = new File(getClass().getResource("rules_error.txt").getFile());
-        Main.main(new String[]{s.getAbsolutePath()});
-
-        assertEquals("Invalid file: Wrong value S|  K", outContent.toString());
-    }
+//    @Test
+//    public void test7() {                           // ошибка в данных - неверный логический символ
+//
+//        File s = new File(getClass().getResource("rules_error.txt").getFile());
+//        Main.main(new String[]{s.getAbsolutePath()});
+//
+//        assertEquals("Invalid file: Wrong value S|  K", outContent.toString());
+//    }
 
     @Test
     public void test8() {                           // ошибка в данных - отсутствует ->
@@ -143,7 +143,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("missing_pointer.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing ->", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("wrong_separator.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing ->", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("missing_Line_rules.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing rules", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
     }
 
 }

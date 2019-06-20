@@ -30,22 +30,22 @@ public class Main {
             System.out.print("Invalid file: " + e.getMessage());
             return;
         } catch (Exception e) {
-            System.out.print("Unknown error");
+            System.out.print("Unknown error: " + e.getMessage());
             return;
         }
 
-        Collection<String> resultsList = null;
 
-            resultsList = model.deduce();
-
+        Collection<String> resultsList = model.deduce();
 
         StringBuilder sb = new StringBuilder();
         Iterator<String> i = resultsList.iterator();
-        while (i.hasNext()) {
+
+        if (i.hasNext())
             sb.append(i.next());
-            if (! i.hasNext())
-                System.out.print(sb);
+        while (i.hasNext()) {
             sb.append(',').append(' ');
+            sb.append(i.next());
         }
+        System.out.print(sb);
     }
 }

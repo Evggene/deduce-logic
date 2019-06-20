@@ -18,7 +18,7 @@ public class Model {
     public Collection<String> deduce() {
         int change = 0;
         for (int i = 0; i < rulesList.size(); i++) {
-            for (int j = 0; j < rulesList.size() - i; j++) {
+            for (int j = 0; j < rulesList.size()-i; j++) {
                 Rule rule = (Rule)((List)rulesList).get(j);
 
                 rule.calculate(knowingFactsList);

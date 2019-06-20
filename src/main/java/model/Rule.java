@@ -1,15 +1,13 @@
 package model;
 
-
 import model.expression.Expression;
-
-import java.util.ArrayList;
 import java.util.Collection;
+
 
 public class Rule {
 
-    Expression expression;
-    String resultFact;
+    private Expression expression;
+    private String resultFact;
 
 
     public Rule(Expression expression, String resultFact) {
@@ -26,5 +24,11 @@ public class Rule {
         }
     }
 
-
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "expression=" + expression +
+                ", resultFact='" + resultFact + '\'' +
+                '}';
+    }
 }

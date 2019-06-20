@@ -2,154 +2,148 @@ package parcer;
 
 import model.Model;
 import model.Rule;
+import model.expression.AndExpression;
 import model.expression.Expression;
 import model.expression.FactExpression;
 import model.expression.OrExpression;
+
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 public class Parser {
 
+    enum FileState {
+        RULE,
+        KNOWN_FACTS,
+        EOF
+    }
+
+
     public Model parse(String path) throws Exception {
 
         Collection<Rule> rulesList = new ArrayList<>();
-        Collection<String> resultList = new ArrayList<>();
+        Collection<String> resultsList = new ArrayList<>();
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get(path), Charset.forName("UTF-8"))) {
             String separator = "----------------------------------------------------------------";
-            String readLine = null;
-            boolean isSeparator = false;
+            String readLine;
+
+            FileState fileState = FileState.RULE;
 
             while ((readLine = br.readLine()) != null) {
-                if (!readLine.equals(separator)) {
+                switch (fileState) {
 
-                    Rule rule = parseRule(readLine);
+                    case RULE:
 
-                    rulesList.add(rule);
+                        if (!readLine.equals(separator))
+                            rulesList.add(parseRule(readLine));
+                        else
+                            fileState = FileState.KNOWN_FACTS;
+                        break;
 
+                    case KNOWN_FACTS:
 
-                } else {
-                    resultList.addAll(parseKnownFacts(br.readLine()));
-                    isSeparator = true;
-                    break;
+                        resultsList.addAll(parseKnownFacts(readLine));
+                        fileState = FileState.EOF;
+                        break;
+
+                    case EOF:
+                        throw new ParserException("invalid file");
                 }
             }
-            if (!isSeparator) {
+            if (fileState == FileState.RULE) {
                 throw new ParserException("missing or wrong separator");
             }
-        }
-        if (rulesList.isEmpty()) {
-            throw new ParserException("missing rules");
+            if (fileState == FileState.KNOWN_FACTS) {
+                throw new ParserException("missing facts");
+            }
+            if (rulesList.isEmpty()) {
+                throw new ParserException("missing rules");
+            }
         }
 
-        return new Model(rulesList, resultList);
+        return new Model(rulesList, resultsList);
+    }
+
+
+    private Rule parseRule(String rule) throws ParserException {
+
+        String[] parts = rule.split(Operators.DEDUCTION.getSymbol());
+        if (parts.length != 2)
+            throw new ParserException("invalid rule syntax");
+
+        return new Rule(parseExpression(parts[0]), validateFact(parts[1].trim()));
     }
 
 
     private List<String> parseKnownFacts(String factsLine) throws ParserException {
 
-        if (factsLine == null || factsLine.length() == 0) {
-            throw new ParserException("missing expressions");
-        }
-
-        String[] knowingFactsLine = factsLine.trim().split(",");
-
+        String[] knowingFactsLine = factsLine.split(",");
         for (int k = 0; k < knowingFactsLine.length; k++) {
-            knowingFactsLine[k] = knowingFactsLine[k].trim();
+            knowingFactsLine[k] = validateFact(knowingFactsLine[k].trim());
         }
-        return validate(Arrays.asList(knowingFactsLine));
+        return Arrays.asList(knowingFactsLine);
     }
 
 
-
-
-    private Rule parseRule(String rule) throws ParserException {
-
-        List<String> ruleLineList = new ArrayList<>();
-
-        if (rule.length() == 0) {
-            throw new ParserException("missing rules");
-        }
-        if (!rule.contains("->")) {
-            throw new ParserException("missing ->");
-        }
-
-        String[] split = rule.split("((?<=\\|{2})|(?=\\|{2})|(?<=&&)|(?=&&)|(?<=->)|(?=->))");
-
-
-
-
+    private Expression parseExpression(String part) throws ParserException {
+        String[] split = part.split("((?<=\\|{2})|(?=\\|{2})|(?<=&{2})|(?=&{2}))");
+        List<String> ruleList = new ArrayList<>();
         for (int i = 0; i < split.length; i++) {
-            ruleLineList.add(split[i].trim());
+            ruleList.add(validateFact(split[i].trim()));
         }
-
-        validate(ruleLineList);
-
-
-
-        String deducingFact = ruleLineList.get(ruleLineList.size()-1);
-        ruleLineList.remove(ruleLineList.size()-1);
-        ruleLineList.remove(ruleLineList.size()-1);
-
-
-
-
-        System.out.println(ruleLineList);
-        Collection<Expression> e = new ArrayList<>();
-
-        for (int i = 0; i < ruleLineList.size(); i++) {
-
-        }
-
-
-
-        e.add(new FactExpression(ruleLineList.get(0)));
-
-
-        return new Rule(new OrExpression(e),  deducingFact);
+        return doExpression(ruleList);
     }
 
 
+    private Expression doExpression(List<String> ruleList) {
 
+        Expression expression = null;
+        Collection<Expression> c = new ArrayList<>();
+        Collection<Expression> orElement = new ArrayList<>();
+        Collection<Expression> andElement = new ArrayList<>();
 
-    private List<String> validate(List<String> line) throws ParserException {
-
-        for (int i = 0; i < line.size(); i++) {
-            if (line.get(i).equals(LogicOperator.DEDUCTION.operationSymbol())
-                    || line.get(i).equals(LogicOperator.AND.operationSymbol())
-                    || line.get(i).equals(LogicOperator.OR.operationSymbol()))
-                continue;
-
-            if (!Character.isLetter(line.get(i).charAt(0)) && !(line.get(i).charAt(0) == '_')
-                    || line.get(i).length() == 1 && !Character.isLetter(line.get(i).charAt(0))) {
-                throw new ParserException("Wrong value " + line.get(i));
-            }
-
-            for (int j = 1; j < line.get(i).length(); j++) {
-                if (!Character.isLetterOrDigit(line.get(i).charAt(j)) && !(line.get(i).charAt(j) == '_')) {
-                    throw new ParserException("Wrong value " + line.get(i));
+        if (ruleList.size() == 1)
+            expression = new FactExpression(ruleList.get(0));
+        else {
+            for (int i = 1; i < ruleList.size(); i += 2) {
+                if (ruleList.get(i).equals(Operators.AND.getSymbol())) {
+                    if (!orElement.isEmpty()) {
+                        andElement.add(new OrExpression(orElement));
+                    } else {
+                        andElement.add(new FactExpression(ruleList.get(i - 1)));
+                    }
+                    andElement.add(new FactExpression(ruleList.get(i + 1)));
+                    c.add(new AndExpression(andElement));
+                } else {
+                    orElement.add(new FactExpression(ruleList.get(i - 1)));
+                    orElement.add(new FactExpression(ruleList.get(i + 1)));
+                    c.add(new OrExpression(orElement));
                 }
-
-                if (line.get(i).charAt(j - 1) == '_' && Character.isDigit(line.get(i).charAt(j))) {
-                    throw new ParserException("Wrong value " + line.get(i));
-                }
+                expression = new OrExpression(c);
             }
+        }
+        return expression;
+    }
 
 
-            boolean b = false;
-            for (int j = 0; j < line.get(i).length(); j++) {
-                if (Character.isLetter(line.get(i).charAt(j))) {
-                    b = true;
-                }
-            }
-            if (!b)
-                throw new ParserException("Wrong value " + line.get(i));
+    private String validateFact(String fact) throws ParserException {
+
+        if (!(fact.equals("||") || fact.equals("&&"))) {
+
+            boolean isWrongSymbol = Pattern.compile("^\\p{Digit}|[_][\\p{Digit}]|__|[^\\w]").matcher(fact).find();
+            boolean isLetter = Pattern.compile("[\\p{Alpha}]").matcher(fact).find();
+
+            if (!isLetter || isWrongSymbol)
+                throw new ParserException("Wrong value " + fact);
         }
 
-        return line;
+        return fact;
     }
+
 }

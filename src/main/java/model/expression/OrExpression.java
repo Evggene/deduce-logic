@@ -2,9 +2,11 @@ package model.expression;
 
 import java.util.Collection;
 
+
 public class OrExpression implements Expression {
 
-    Collection<Expression> expressions;
+    private Collection<Expression> expressions;
+
 
     public OrExpression(Collection<Expression> expressions) {
         this.expressions = expressions;
@@ -18,5 +20,12 @@ public class OrExpression implements Expression {
             }
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "OrExpression{" +
+                expressions +
+                '}';
     }
 }
