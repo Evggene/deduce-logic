@@ -1,9 +1,8 @@
-D&&Y->G
-O||X->D
- H->O
-S||  K  ->L
-L->H
-  Df || Yg && jhkl->ZZ
-  Df && S && jhkl || S ->ZZ2
+_O3 || X_d6->D
+     H->_O3
+S ||  _dfgh_f2f  -> _yu6
+     _yu6 -> H
+Df7g_u8 || Yg && jhkl -> ZZ
+     Df7g_u8 && S && jhkl || S-> ZZ2
 ----------------------------------------------------------------
-Df, S
+Df7g_u8, S
