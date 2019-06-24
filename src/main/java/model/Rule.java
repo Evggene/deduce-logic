@@ -18,11 +18,10 @@ public class Rule {
 
     void calculate(Collection<String> knownFacts) {
         if (expression.calculate(knownFacts)) {
-            if (!knownFacts.contains(resultFact)) {
                 knownFacts.add(resultFact);
             }
         }
-    }
+
 
     @Override
     public String toString() {

@@ -71,7 +71,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("first.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Df, S, L, H, ZZ, O, D", outContent.toString());
+        assertEquals("ZZ, Df, S, D, H, L, O", outContent.toString());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("valid.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Df7g_u8, S, _yu6, H, ZZ, ZZ2, _O3, D", outContent.toString());
+        assertEquals("ZZ, _O3, S, ZZ2, D, _yu6, H, Df7g_u8", outContent.toString());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class Tests extends Assert {
         File s = new File("про");
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Error when reading file: C:\\Users\\Evgeniy.Bezlepkin\\IdeaProjects\\EvgenyDeduce\\про"
+        assertEquals("Error when reading file: C:\\Users\\Evgeniy.Bezlepkin\\Desktop\\EvgenyDeduce2\\про"
                 , outContent.toString());
     }
 

@@ -43,8 +43,7 @@ public class Main {
         if (i.hasNext())
             sb.append(i.next());
         while (i.hasNext()) {
-            sb.append(',').append(' ');
-            sb.append(i.next());
+            sb.append(", ").append(i.next());
         }
         System.out.print(sb);
     }

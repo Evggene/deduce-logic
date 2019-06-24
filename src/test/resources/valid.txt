@@ -1,4 +1,4 @@
-_O3 || X_d6->D
+_O3 || X__d6->D
      H->_O3
 S ||  _dfgh_f2f  -> _yu6
      _yu6 -> H

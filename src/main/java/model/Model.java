@@ -1,34 +1,32 @@
 package model;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
 
 
 public class Model {
     private Collection<Rule> rulesList;
-    private Collection<String> knowingFactsList;
+    private Set<String> knownFactsList;
 
 
-    public Model(Collection<Rule> rulesList, Collection<String> knowingFactsList) {
+    public Model(Collection<Rule> rulesList, Set<String> knownFactsList) {
         this.rulesList = rulesList;
-        this.knowingFactsList = knowingFactsList;
+        this.knownFactsList = knownFactsList;
     }
 
 
     public Collection<String> deduce() {
-        int change = 0;
-        for (int i = 0; i < rulesList.size(); i++) {
-            for (int j = 0; j < rulesList.size()-i; j++) {
-                Rule rule = (Rule)((List)rulesList).get(j);
+        int knownFactsSize = 0;
 
-                rule.calculate(knowingFactsList);
-            }
-            if (change == knowingFactsList.size()) {
-                break;
-            } else {
-                change = knowingFactsList.size();
+        while (knownFactsSize != knownFactsList.size()) {
+            knownFactsSize = knownFactsList.size();
+
+            for (Iterator<Rule> iter = rulesList.iterator(); iter.hasNext(); ) {
+                iter.next().calculate(knownFactsList);
             }
         }
-        return knowingFactsList;
+
+        return knownFactsList;
     }
 }
