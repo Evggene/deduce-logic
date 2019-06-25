@@ -72,10 +72,9 @@ public class Parser {
     }
 
 
-
     private Rule parseRule(String rule) throws ParserException {
 
-        String[] parts = rule.split(Operators.DEDUCTION.getSymbol());
+        String[] parts = rule.split("->",-1);
         if (parts.length != 2)
             throw new ParserException("invalid rule syntax");
 
@@ -83,10 +82,10 @@ public class Parser {
     }
 
 
-
     private Expression parseExpression(String part) throws ParserException {
 
-        String[] split = part.split("\\|\\|");
+        String[] split = part.split("\\|\\|", -1 );
+        System.out.println(Arrays.toString(split));
         ArrayList<Expression> orElement = new ArrayList<>();
 
         for (String elem : split) {
@@ -96,12 +95,10 @@ public class Parser {
     }
 
 
-
     private Expression parseAndExpression(String part) throws ParserException {
 
         ArrayList<Expression> andElement = new ArrayList<>();
-        String[] split = part.split(Operators.AND.getSymbol());
-
+        String[] split = part.split("&&", -1);
         for (String elem : split) {
             andElement.add(new FactExpression(validateFact(elem.trim())));
         }
@@ -111,7 +108,7 @@ public class Parser {
 
     private List<String> parseKnownFacts(String factsLine) throws ParserException {
 
-        String[] knowingFactsLine = factsLine.split(",");
+        String[] knowingFactsLine = factsLine.split(",", -1);
         for (int k = 0; k < knowingFactsLine.length; k++) {
             knowingFactsLine[k] = validateFact(knowingFactsLine[k].trim());
         }
@@ -121,18 +118,9 @@ public class Parser {
 
     private String validateFact(String fact) throws ParserException {
 
-//        boolean isWrongSymbol = Pattern.compile("^\\p{Digit}|[_][\\p{Digit}]|[^\\w]").matcher(fact).find();
-//        boolean isLetter = Pattern.compile("[\\p{Alpha}]").matcher(fact).find();
+        boolean validFact = Pattern.compile("^_*\\p{Alpha}+\\w*$").matcher(fact).find();
 
-
-            boolean begin = Pattern.compile("^[_\\p{Alpha}]").matcher(fact).find();
-            boolean isLetter = Pattern.compile("[\\p{Alpha}]").matcher(fact).find();
-            boolean otherSymbol = Pattern.compile("[^\\w]").matcher(fact).find();
-
-
-
-            if (otherSymbol || !isLetter || !begin)
-                throw new ParserException("Wrong value " + fact);
+        if (!validFact ) throw new ParserException("Wrong value " + fact);
 
         return fact;
     }
