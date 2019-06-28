@@ -5,9 +5,6 @@ import org.junit.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
-
-import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
 
 public class Tests extends Assert {
@@ -75,6 +72,15 @@ public class Tests extends Assert {
     }
 
     @Test
+    public void test111() {                           // валидный файл, тест на логику
+
+        File s = new File(getClass().getResource("simple_logic_set.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("GG, S, D, GGG, G, H", outContent.toString());
+    }
+
+    @Test
     public void test21() {                           // валидный файл посложнее, тест на логику
 
         File s = new File(getClass().getResource("valid.txt").getFile());
@@ -137,14 +143,32 @@ public class Tests extends Assert {
         assertEquals("Invalid file: invalid rule syntax", outContent.toString());
     }
 
-//    @Test
-//    public void test7() {                           // ошибка в данных - неверный логический символ
-//
-//        File s = new File(getClass().getResource("rules_error.txt").getFile());
-//        Main.main(new String[]{s.getAbsolutePath()});
-//
-//        assertEquals("Invalid file: Wrong value S|  K", outContent.toString());
-//    }
+    @Test
+    public void test7() {                           // ошибка в данных - неверный логический символ
+
+        File s = new File(getClass().getResource("rules_error.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
+
+    @Test
+    public void test72() {                           // ошибка в данных - неверный логический символ
+
+        File s = new File(getClass().getResource("rules_error_2.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
+
+    @Test
+    public void test73() {                           // ошибка в данных - неверный логический символ
+
+        File s = new File(getClass().getResource("rules_error_3.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
 
     @Test
     public void test8() {                           // ошибка в данных - отсутствует ->
@@ -170,13 +194,31 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("wrong_rules_facts.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: Wrong value Df || Yg && jhkl->ZZ", outContent.toString());
+        assertEquals("Invalid file: error with known facts", outContent.toString());
     }
 
     @Test
     public void test11() {                           // ошибка в правилах - пустая линия
 
         File s = new File(getClass().getResource("missing_Line_rules.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
+
+//    @Test
+//    public void test12() {                           // ошибка в правилах - пустая линия
+//
+//        File s = new File(getClass().getResource("hanging_rule.txt").getFile());
+//        Main.main(new String[]{s.getAbsolutePath()});
+//
+//        assertEquals("Invalid file: Wrong value ", outContent.toString());
+//    }
+
+    @Test
+    public void test221() {                           // ошибка в правилах - пустая линия
+
+        File s = new File(getClass().getResource("wrong_fact_space.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("Invalid file: invalid rule syntax", outContent.toString());
