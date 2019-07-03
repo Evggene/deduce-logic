@@ -23,45 +23,6 @@ public class Tests extends Assert {
     }
 
 
-//    @Test       // на все эти идентификаторы вылетает Exception
-//    public void testIdentificators1() throws parcer.ParserException {
-//        parcer.Parser p = new parcer.Parser();
-//        ArrayList<String> list = new ArrayList();
-//
-//        list.add("D && F -> K");
-//        p.validateLine(list);
-//        list.clear();
-//
-//        list.add("^gh && F -> K");
-//        p.validateLine(list);
-//        list.clear();
-//
-//        list.add("gh& && F -> K");
-//        p.validateLine(list);
-//        list.clear();
-//
-//        p.checkIdentificator("_");
-//        p.checkIdentificator("3");
-//        p.checkIdentificator("_|||");
-//        p.checkIdentificator("__");
-//        p.checkIdentificator("___");
-//        p.checkIdentificator("_12H||");
-//        p.checkIdentificator("_333");
-//        p.checkIdentificator(",");
-//    }
-//
-//
-//    @Test       // валидные идентификаторы
-//    public void testIdentificators2() throws Exception {
-//        parcer.Parser p = new parcer.Parser(listOfLogics, listOfResults);
-//        p.checkIdentificator("d");   // valid
-//        p.checkIdentificator("g2h");   // valid
-//        p.checkIdentificator("g_h");   // valid
-//        p.checkIdentificator("_gh");  // valid
-
-//    }
-
-
     @Test
     public void test1() {                           // валидный файл, тест на логику
 
@@ -131,7 +92,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("facts_error_emptyFacts.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: missing facts", outContent.toString());
+        assertEquals("Invalid file: missing known facts", outContent.toString());
     }
 
     @Test
@@ -206,14 +167,14 @@ public class Tests extends Assert {
         assertEquals("Invalid file: invalid rule syntax", outContent.toString());
     }
 
-//    @Test
-//    public void test12() {                           // ошибка в правилах - пустая линия
-//
-//        File s = new File(getClass().getResource("hanging_rule.txt").getFile());
-//        Main.main(new String[]{s.getAbsolutePath()});
-//
-//        assertEquals("Invalid file: Wrong value ", outContent.toString());
-//    }
+    @Test
+    public void test12() {                           // ошибка в правилах - висячая строка
+
+        File s = new File(getClass().getResource("hanging_rule.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
 
     @Test
     public void test221() {                           // ошибка в правилах - пустая линия
@@ -222,6 +183,42 @@ public class Tests extends Assert {
         Main.main(new String[]{s.getAbsolutePath()});
 
         assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
+
+    @Test
+    public void test222() {                           // ошибка в правилах - неверный выводимый факт
+
+        File s = new File(getClass().getResource("rules_error_4.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
+
+    @Test
+    public void test223() {                           // ошибка в правилах - ошибка в факте
+
+        File s = new File(getClass().getResource("rules_error_5.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+    }
+
+    @Test
+    public void test224() {                           // ошибка в фактах
+
+        File s = new File(getClass().getResource("rules_error_6.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("Invalid file: error with known facts", outContent.toString());
+    }
+
+    @Test
+    public void test225() {                           // сложные правила
+
+        File s = new File(getClass().getResource("validS.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("ZZ, Df, A3, ZZ2, e, K, L, M", outContent.toString());
     }
 
 }

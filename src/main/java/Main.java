@@ -30,7 +30,7 @@ public class Main {
             System.out.print("Invalid file: " + e.getMessage());
             return;
         } catch (Exception e) {
-            System.out.print("Unknown error: " + "wrong sintax in file");
+            System.out.print("Unknown error: " + "wrong syntax in file");
             return;
         }
 
