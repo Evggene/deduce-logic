@@ -221,6 +221,14 @@ public class Tests extends Assert {
         assertEquals("ZZ, Df, A3, ZZ2, e, K, L, M", outContent.toString());
     }
 
+    @Test
+    public void test226() {                           // сложные правила
+
+        File s = new File(getClass().getResource("simple_brackets.txt").getFile());
+        Main.main(new String[]{s.getAbsolutePath()});
+
+        assertEquals("A, H, H1, H2, H3, H4, H5, H6, H7", outContent.toString());
+    }
 }
 
 

@@ -8,6 +8,7 @@ import model.expression.Expression;
 import model.expression.FactExpression;
 import model.expression.OrExpression;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -27,7 +28,9 @@ public class Parser {
     enum RuleState {
         AndOperator, OrOperator, BeforeOperator, Deduction,
         BeforeFact, Fact, UnderscoreFact,
-        BeforeResultFact, UnderscoreResultFact, ResultFact, EOL
+        BeforeResultFact, UnderscoreResultFact, ResultFact, EOL,
+        StartBracketExpression, EndBracketExpression,
+        InBracketFact, InBracketBeforeOperator, InBracketAndOperator, InBracketOrOperator, InBracketBeforeFact, InBracketsUnderscoreFact
     }
 
 
@@ -89,15 +92,20 @@ public class Parser {
         RuleState ruleState = RuleState.BeforeFact;
         StringBuilder fact = new StringBuilder();
         Expression currentExpression = null;
+        ArrayDeque<String> s = new ArrayDeque<>();
+        ArrayList<Expression> subOrElements = new ArrayList<>();
+        ArrayList<Expression> subAndElements = new ArrayList<>();
+        Expression currentBrackExpr = null;
+        ArrayDeque<Expression> bracketDeque = new ArrayDeque<>();
+
 
         for (int i = 0; i < rule.length(); i++) {
 
             switch (ruleState) {
 
                 case BeforeFact:
-                    if (rule.charAt(i) == ' ') {
+                    if (rule.charAt(i) == ' ')
                         break;
-                    }
                     if (Character.isLetter(rule.charAt(i))) {
                         fact.append(rule.charAt(i));
                         ruleState = RuleState.Fact;
@@ -108,7 +116,80 @@ public class Parser {
                         ruleState = RuleState.UnderscoreFact;
                         break;
                     }
+                    if (rule.charAt(i) == '(') {
+                        s.add("(");
+                        ruleState = RuleState.StartBracketExpression;
+                        break;
+                    }
                     throw new ParserException("invalid rule syntax");
+
+
+                case InBracketBeforeFact:
+                    if (rule.charAt(i) == ' ')
+                        break;
+                    if (Character.isLetter(rule.charAt(i))) {
+                        fact.append(rule.charAt(i));
+                        ruleState = RuleState.InBracketFact;
+                        break;
+                    }
+                    if (rule.charAt(i) == '_') {
+                        fact.append(rule.charAt(i));
+                        ruleState = RuleState.InBracketsUnderscoreFact;
+                        break;
+                    }
+                    if (rule.charAt(i) == '(') {
+                        s.add("(");
+                        ruleState = RuleState.StartBracketExpression;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+
+
+                case InBracketsUnderscoreFact:
+                    if (rule.charAt(i) == '_') {
+                        fact.append(rule.charAt(i));
+                        break;
+                    }
+                    if (Character.isLetter(rule.charAt(i))) {
+                        fact.append(rule.charAt(i));
+                        ruleState = RuleState.InBracketFact;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+
+
+                case StartBracketExpression: {
+
+                    if (rule.charAt(i) == ' ')
+                        break;
+                    if (currentBrackExpr != null) {
+                        bracketDeque.add(currentBrackExpr);
+                        if (!subAndElements.isEmpty()) {
+                            subAndElements = new ArrayList<>();
+                        }
+                        if (!subOrElements.isEmpty()) {
+                            subOrElements = new ArrayList<>();
+                        }
+                    }
+                    if (rule.charAt(i) == '_') {
+                        fact.append(rule.charAt(i));
+                        ruleState = RuleState.UnderscoreFact;
+                        break;
+                    }
+                    if (Character.isLetter(rule.charAt(i))) {
+                        fact.append(rule.charAt(i));
+                        ruleState = RuleState.InBracketFact;
+                        break;
+                    }
+                    if (rule.charAt(i) == '(') {
+                        s.add("(");
+                        // subOrElements = new ArrayList<>();
+                        // subAndElements = new ArrayList<>();
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+                }
+
 
                 case UnderscoreFact:
                     if (rule.charAt(i) == '_') {
@@ -121,6 +202,7 @@ public class Parser {
                         break;
                     }
                     throw new ParserException("invalid rule syntax");
+
 
                 case Fact:
                     if (rule.charAt(i) == '-') {
@@ -147,11 +229,57 @@ public class Parser {
                         ruleState = RuleState.BeforeOperator;
                         break;
                     }
+                    if (rule.charAt(i) == ')') {
+                        currentExpression = new FactExpression(fact.toString());
+                        fact = new StringBuilder();
+
+                        if ("(" != s.poll()) {
+                            throw new ParserException("invalid brackets");
+                        }
+                        ruleState = RuleState.EndBracketExpression;
+                        break;
+                    }
                     if (!Character.isLetterOrDigit(rule.charAt(i)) && rule.charAt(i) != '_') {
                         throw new ParserException("invalid rule syntax");
                     }
                     fact.append(rule.charAt(i));
                     break;
+
+
+                case InBracketFact:
+                    if (rule.charAt(i) == '&') {
+                        currentBrackExpr = new FactExpression(fact.toString());
+                        fact = new StringBuilder();
+                        ruleState = RuleState.InBracketAndOperator;
+                        break;
+                    }
+                    if (rule.charAt(i) == '|') {
+                        currentBrackExpr = new FactExpression(fact.toString());
+                        fact = new StringBuilder();
+                        ruleState = RuleState.InBracketOrOperator;
+                        break;
+                    }
+                    if (rule.charAt(i) == ' ') {
+                        currentBrackExpr = new FactExpression(fact.toString());
+                        fact = new StringBuilder();
+                        ruleState = RuleState.InBracketBeforeOperator;
+                        break;
+                    }
+                    if (rule.charAt(i) == ')') {
+                        if ("(" != s.poll()) {
+                            throw new ParserException("invalid brackets");
+                        }
+                        currentBrackExpr = new FactExpression(fact.toString());
+                        fact = new StringBuilder();
+                        ruleState = RuleState.EndBracketExpression;
+                        break;
+                    }
+                    if (!Character.isLetterOrDigit(rule.charAt(i)) && rule.charAt(i) != '_') {
+                        throw new ParserException("invalid rule syntax");
+                    }
+                    fact.append(rule.charAt(i));
+                    break;
+
 
                 case BeforeOperator:
                     if (rule.charAt(i) == '-') {
@@ -169,7 +297,114 @@ public class Parser {
                     if (rule.charAt(i) == ' ') {
                         break;
                     }
+                    if (rule.charAt(i) == ')') {
+                        if ("(" != s.poll()) {
+                            throw new ParserException("invalid brackets");
+                        }
+                        ruleState = RuleState.EndBracketExpression;
+                        break;
+                    }
                     throw new ParserException("invalid rule syntax");
+
+
+                case InBracketBeforeOperator:
+                    if (rule.charAt(i) == '&') {
+                        ruleState = RuleState.InBracketAndOperator;
+                        break;
+                    }
+                    if (rule.charAt(i) == '|') {
+                        ruleState = RuleState.InBracketOrOperator;
+                        break;
+                    }
+                    if (rule.charAt(i) == ' ') {
+                        break;
+                    }
+                    if (rule.charAt(i) == ')') {
+                        if ("(" != s.poll()) {
+                            throw new ParserException("invalid brackets");
+                        }
+                        ruleState = RuleState.EndBracketExpression;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+
+
+                case EndBracketExpression: {
+
+
+                    if (!subAndElements.isEmpty()) {
+                        subAndElements.add(currentBrackExpr);
+                        currentBrackExpr = new AndExpression(subAndElements);
+                        subAndElements = new ArrayList<>();
+                    }
+                    if (!subOrElements.isEmpty()) {
+                        subOrElements.add(currentBrackExpr);
+                        currentBrackExpr = new OrExpression(subOrElements);
+                        subOrElements = new ArrayList<>();
+                    }
+        //                          System.out.println(bracketDeque.peek());
+                    while (!bracketDeque.isEmpty()) {
+                        //                System.out.println("stack " + bracketDeque.peek());
+                        Expression e = bracketDeque.pollLast();
+                        subOrElements.add(e);
+                     //   System.out.println(currentBrackExpr);
+                        subOrElements.add(currentBrackExpr);
+
+                        if ((e instanceof FactExpression)) {                    // плохой участок
+                            currentBrackExpr = new OrExpression(subOrElements);
+
+                        }
+
+                        //           System.out.println(subOrElements);
+                        subAndElements = new ArrayList<>();
+                        subOrElements = new ArrayList<>();
+                    }
+
+                    System.out.println(currentBrackExpr);
+                    if (s.isEmpty()) {
+                        currentExpression = currentBrackExpr;
+                        //              System.out.println(currentExpression);
+                    }
+
+                    if (rule.charAt(i) == ' ') {
+                        break;
+                    }
+                    if (rule.charAt(i) == ')') {
+                        if ("(" != s.poll()) {
+                            throw new ParserException("invalid brackets");
+                        }
+                        break;
+                    }
+                    if (!s.isEmpty()) {
+                        if (rule.charAt(i) == '&') {
+                            ruleState = RuleState.InBracketAndOperator;
+                            break;
+                        }
+                        if (rule.charAt(i) == '|') {
+                            ruleState = RuleState.InBracketOrOperator;
+                            break;
+                        }
+                    }
+                    if (rule.charAt(i) == '-') {
+                        if (subAndElements.isEmpty() && subOrElements.isEmpty()) {
+                            ruleState = RuleState.Deduction;
+                            break;
+                        } else {
+                            ruleState = RuleState.BeforeResultFact;
+                            break;
+                        }
+                    }
+                    if (rule.charAt(i) == '&') {
+                        ruleState = RuleState.AndOperator;
+                        break;
+                    }
+                    if (rule.charAt(i) == '|') {
+                        ruleState = RuleState.OrOperator;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+                }
+
 
                 case AndOperator:
                     if (rule.charAt(i) == '&') {
@@ -179,6 +414,7 @@ public class Parser {
                     }
                     throw new ParserException("invalid rule syntax");
 
+
                 case OrOperator:
                     if (rule.charAt(i) == '|') {
                         if (!andElements.isEmpty()) {
@@ -186,31 +422,67 @@ public class Parser {
                             currentExpression = new AndExpression(andElements);
                             andElements = new ArrayList<>();
                         }
-
                         orElements.add(currentExpression);
                         ruleState = RuleState.BeforeFact;
                         break;
                     }
                     throw new ParserException("invalid rule syntax");
 
+
+                case InBracketAndOperator:
+                    if (rule.charAt(i) == '&') {
+                        //System.out.println(bracketDeque);
+                        subAndElements.add(currentBrackExpr);
+                        //currentBrackExpr = null;
+                        ruleState = RuleState.InBracketBeforeFact;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+
+
+                case InBracketOrOperator:
+                    if (rule.charAt(i) == '|') {
+                        if (!subAndElements.isEmpty()) {
+                            subAndElements.add(currentBrackExpr);
+                            currentBrackExpr = new AndExpression(subAndElements);
+
+                            subAndElements = new ArrayList<>();
+                        }
+
+                        subOrElements.add(currentBrackExpr);
+                        //currentBrackExpr = null;
+                        ruleState = RuleState.InBracketBeforeFact;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+
+
                 case Deduction:
                     if (rule.charAt(i) == '>') {
+
                         if (!andElements.isEmpty()) {
                             andElements.add(currentExpression);
                             currentExpression = new AndExpression(andElements);
+                            andElements = new ArrayList<>();
                         }
-
                         if (!orElements.isEmpty()) {
                             orElements.add(currentExpression);
                             currentExpression = new OrExpression(orElements);
                         }
+
+                        //            System.out.println("! " + currentExpression);
+
 
                         ruleState = RuleState.BeforeResultFact;
                         break;
                     }
                     throw new ParserException("invalid rule syntax");
 
+
                 case BeforeResultFact:
+                    if (rule.charAt(i) == '>') {
+                        break;
+                    }
                     if (rule.charAt(i) == ' ') {
                         break;
                     }
@@ -226,6 +498,7 @@ public class Parser {
                     }
                     throw new ParserException("invalid rule syntax");
 
+
                 case UnderscoreResultFact:
                     if (rule.charAt(i) == '_') {
                         fact.append(rule.charAt(i));
@@ -237,6 +510,7 @@ public class Parser {
                         break;
                     }
                     throw new ParserException("invalid rule syntax");
+
 
                 case ResultFact:
                     if (rule.charAt(i) == ' ') {
@@ -259,7 +533,12 @@ public class Parser {
         if (ruleState != RuleState.ResultFact && ruleState != RuleState.EOL) {
             throw new ParserException("invalid rule syntax");
         }
+        if (!s.isEmpty()) {
+            throw new ParserException("invalid brackets");
+        }
 
+
+//123123123
         System.out.println(currentExpression.toString());
         return new Rule(currentExpression, fact.toString());
 
