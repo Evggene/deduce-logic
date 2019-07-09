@@ -101,7 +101,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("absent_separator.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Unknown error: wrong syntax in file", outContent.toString());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("missing_Line_rules.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Unknown error: wrong syntax in file", outContent.toString());
     }
 
     @Test
@@ -227,7 +227,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("simple_brackets.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("A, H, H1, H2, H3, H4, H5, H6, H7", outContent.toString());
+        assertEquals("A, H, H1, H3, H5, H6, H7", outContent.toString());
     }
 }
 
