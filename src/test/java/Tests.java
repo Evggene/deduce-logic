@@ -110,7 +110,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rules_error.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax: wrong operator", outContent.toString());
     }
 
     @Test
@@ -119,7 +119,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rules_error_2.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax: wrong operator", outContent.toString());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rules_error_3.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax: wrong operator", outContent.toString());
     }
 
     @Test
@@ -191,7 +191,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rules_error_4.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax: wrong symbol in deducing fact", outContent.toString());
     }
 
     @Test
@@ -200,7 +200,7 @@ public class Tests extends Assert {
         File s = new File(getClass().getResource("rules_error_5.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
 
-        assertEquals("Invalid file: invalid rule syntax", outContent.toString());
+        assertEquals("Invalid file: invalid rule syntax: wrong symbols", outContent.toString());
     }
 
     @Test

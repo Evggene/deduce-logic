@@ -23,13 +23,13 @@ public class Parser {
     }
 
     enum ExpressionState {
-        AndOperator, OrOperator, BeforeOperator,
-        BeforeFact, Fact, UnderscoreFact,
-        StartBracketExpression, CreateExpression
+        BeforeFact, UnderscoreFact, Fact,
+        BeforeOperator, AndOperator, OrOperator
     }
 
-    enum ResultFactState {
-        BeforeResultFact, UnderscoreResultFact, ResultFact, EOL, Deduction
+    enum RuleState {
+        Begin, Imply,
+        BeforeFact, UnderscoreFact, Fact, EOL
     }
 
     enum KnownFactsState {
@@ -81,156 +81,115 @@ public class Parser {
         return new Model(rulesList, resultsList);
     }
 
-
-    private Expression parseExpression(String rule, int i) throws ParserException {
-
+    private Expression parseExpression(String rule) throws ParserException {
         ExpressionState state = ExpressionState.BeforeFact;
-
         ArrayList<Expression> orElements = new ArrayList<>();
         ArrayList<Expression> andElements = new ArrayList<>();
         StringBuilder fact = new StringBuilder();
         Expression currentExpression = null;
-        currentPos = i;
 
-        for (; currentPos < rule.length(); currentPos++) {
+        for (currentPos++; currentPos < rule.length(); currentPos++) {
+            char currentChar = rule.charAt(currentPos);
             switch (state) {
-
                 case BeforeFact:
-                    if (rule.charAt(currentPos) == ' ')
+                    if (currentChar == ' ')
                         break;
-                    if (Character.isLetter(rule.charAt(currentPos))) {
-                        fact.append(rule.charAt(currentPos));
+                    if (Character.isLetter(currentChar)) {
+                        fact.append(currentChar);
                         state = ExpressionState.Fact;
                         break;
                     }
-                    if (rule.charAt(currentPos) == '_') {
-                        fact.append(rule.charAt(currentPos));
+                    if (currentChar == '_') {
+                        fact.append(currentChar);
                         state = ExpressionState.UnderscoreFact;
                         break;
                     }
-                    if (rule.charAt(currentPos) == '(') {
-                        state = ExpressionState.StartBracketExpression;
+                    if (currentChar == '(') {
+                        currentExpression = parseExpression(rule);
+                        state = ExpressionState.BeforeOperator;
                         break;
                     }
                     throw new ParserException("invalid rule syntax");
-
-
-                case StartBracketExpression: {
-                    currentExpression = parseExpression(rule, currentPos);
-                    state = ExpressionState.BeforeOperator;
-                    break;
-                }
 
 
                 case UnderscoreFact:
-                    if (rule.charAt(currentPos) == '_') {
-                        fact.append(rule.charAt(currentPos));
+                    if (currentChar == '_') {
+                        fact.append(currentChar);
                         break;
                     }
-                    if (Character.isLetter(rule.charAt(currentPos))) {
-                        fact.append(rule.charAt(currentPos));
+                    if (Character.isLetter(currentChar)) {
+                        fact.append(currentChar);
                         state = ExpressionState.Fact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
-
+                    throw new ParserException("invalid rule syntax: wrong symbols");
 
                 case Fact:
-                    if (rule.charAt(currentPos) == '-') {
+                    if (currentChar == '-') {
                         currentExpression = new FactExpression(fact.toString());
-                        state = ExpressionState.CreateExpression;
-                        break;
+                        return assembleExpression(orElements, andElements, currentExpression);
                     }
-                    if (rule.charAt(currentPos) == '&') {
+                    if (currentChar == '&') {
                         currentExpression = new FactExpression(fact.toString());
                         fact = new StringBuilder();
                         state = ExpressionState.AndOperator;
                         break;
                     }
-                    if (rule.charAt(currentPos) == '|') {
+                    if (currentChar == '|') {
                         currentExpression = new FactExpression(fact.toString());
                         fact = new StringBuilder();
                         state = ExpressionState.OrOperator;
                         break;
                     }
-                    if (rule.charAt(currentPos) == ' ') {
+                    if (currentChar == ' ') {
                         currentExpression = new FactExpression(fact.toString());
                         fact = new StringBuilder();
                         state = ExpressionState.BeforeOperator;
                         break;
                     }
-                    if (rule.charAt(currentPos) == ')') {
+                    if (currentChar == ')') {
                         currentExpression = new FactExpression(fact.toString());
-                        if (!andElements.isEmpty()) {
-                            andElements.add(currentExpression);
-                            currentExpression = new AndExpression(andElements);
-                        }
-                        if (!orElements.isEmpty()) {
-                            orElements.add(currentExpression);
-                            currentExpression = new OrExpression(orElements);
-                        }
-                        return currentExpression;
+                        return assembleExpression(orElements, andElements, currentExpression);
                     }
-                    if (!Character.isLetterOrDigit(rule.charAt(currentPos)) && rule.charAt(currentPos) != '_') {
-                        throw new ParserException("invalid rule syntax");
+                    if (!Character.isLetterOrDigit(currentChar) && currentChar != '_') {
+                        throw new ParserException("invalid rule syntax: wrong symbols");
                     }
-                    fact.append(rule.charAt(currentPos));
+                    fact.append(currentChar);
                     break;
 
 
-                case CreateExpression:
-                    if (!andElements.isEmpty()) {
-                        andElements.add(currentExpression);
-                        currentExpression = new AndExpression(andElements);
-                    }
-                    if (!orElements.isEmpty()) {
-                        orElements.add(currentExpression);
-                        currentExpression = new OrExpression(orElements);
-                    }
-                    return currentExpression;
-
-
                 case BeforeOperator:
-                    if (rule.charAt(currentPos) == '-') {
-                        state = ExpressionState.CreateExpression;
-                        break;
+                    if (currentChar == '-') {
+                        return assembleExpression(orElements, andElements, currentExpression);
                     }
-                    if (rule.charAt(currentPos) == '&') {
+                    if (currentChar == '&') {
                         state = ExpressionState.AndOperator;
                         break;
                     }
-                    if (rule.charAt(currentPos) == '|') {
+                    if (currentChar == '|') {
                         state = ExpressionState.OrOperator;
                         break;
                     }
-                    if (rule.charAt(currentPos) == ' ') {
+                    if (currentChar == ' ') {
                         break;
                     }
-                    if (rule.charAt(currentPos) == ')') {
-                        if (!andElements.isEmpty()) {
-                            andElements.add(currentExpression);
-                            currentExpression = new AndExpression(andElements);
-                        }
-                        if (!orElements.isEmpty()) {
-                            orElements.add(currentExpression);
-                            currentExpression = new OrExpression(orElements);
-                        }
-                        return currentExpression;
+                    if (currentChar == ')') {
+                        return assembleExpression(orElements, andElements, currentExpression);
                     }
                     throw new ParserException("invalid rule syntax");
 
 
                 case AndOperator:
-                    if (rule.charAt(currentPos) == '&') {
+                    if (currentChar == '&') {
                         andElements.add(currentExpression);
                         state = ExpressionState.BeforeFact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException("invalid rule syntax: wrong operator");
 
 
                 case OrOperator:
-                    if (rule.charAt(currentPos) == '|') {
+                    if (currentChar == '|') {
                         if (!andElements.isEmpty()) {
                             andElements.add(currentExpression);
                             currentExpression = new AndExpression(andElements);
@@ -240,91 +199,105 @@ public class Parser {
                         state = ExpressionState.BeforeFact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException("invalid rule syntax: wrong operator");
             }
         }
         throw new ParserException("invalid rule syntax");
     }
 
+    private Expression assembleExpression(ArrayList<Expression> orElements, ArrayList<Expression> andElements, Expression currentExpression) {
+        if (!andElements.isEmpty()) {
+            andElements.add(currentExpression);
+            currentExpression = new AndExpression(andElements);
+        }
+        if (!orElements.isEmpty()) {
+            orElements.add(currentExpression);
+            currentExpression = new OrExpression(orElements);
+        }
+        return currentExpression;
+    }
+
 
     private Rule parseRule(String rule) throws ParserException {
 
-        currentPos = 0;
-        ResultFactState state = ResultFactState.Deduction;
-        Expression resultExpression = parseExpression(rule, currentPos);
+        currentPos = -1;
+        Expression resultExpression = parseExpression(rule);
+        RuleState state = RuleState.Begin;
         StringBuilder fact = new StringBuilder();
 
         for (; currentPos < rule.length(); currentPos++) {
+            char currentChar = rule.charAt(currentPos);
 
             switch (state) {
 
-                case Deduction:
-                    if (rule.charAt(currentPos) == '>') {
-                        state = ResultFactState.BeforeResultFact;
+                case Begin:
+                    if (currentChar == '-') {
+                        state = RuleState.Imply;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax");
+                    
+                case Imply:
+                    if (currentChar == '>') {
+                        state = RuleState.BeforeFact;
                         break;
                     }
                     throw new ParserException("invalid rule syntax");
 
-                case BeforeResultFact:
-                    if (rule.charAt(currentPos) == '>') {
+                case BeforeFact:
+                    if (currentChar == ' ') {
                         break;
                     }
-                    if (rule.charAt(currentPos) == ' ') {
+                    if (Character.isLetter(currentChar)) {
+                        fact.append(currentChar);
+                        state = RuleState.Fact;
                         break;
                     }
-                    if (Character.isLetter(rule.charAt(currentPos))) {
-                        fact.append(rule.charAt(currentPos));
-                        state = ResultFactState.ResultFact;
+                    if (currentChar == '_') {
+                        fact.append(currentChar);
+                        state = RuleState.UnderscoreFact;
                         break;
                     }
-                    if (rule.charAt(currentPos) == '_') {
-                        fact.append(rule.charAt(currentPos));
-                        state = ResultFactState.UnderscoreResultFact;
+                    throw new ParserException("invalid rule syntax: wrong symbol in deducing fact");
+
+                case UnderscoreFact:
+                    if (currentChar == '_') {
+                        fact.append(currentChar);
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    if (Character.isLetter(currentChar)) {
+                        fact.append(currentChar);
+                        state = RuleState.Fact;
+                        break;
+                    }
+                    throw new ParserException("invalid rule syntax: wrong symbol in deducing fact");
 
 
-                case UnderscoreResultFact:
-                    if (rule.charAt(currentPos) == '_') {
-                        fact.append(rule.charAt(currentPos));
+                case Fact:
+                    if (currentChar == ' ') {
+                        state = RuleState.EOL;
                         break;
                     }
-                    if (Character.isLetter(rule.charAt(currentPos))) {
-                        fact.append(rule.charAt(currentPos));
-                        state = ResultFactState.ResultFact;
-                        break;
+                    if (!Character.isLetterOrDigit(currentChar) && currentChar != '_') {
+                        throw new ParserException("invalid rule syntax: wrong symbol in deducing fact");
                     }
-                    throw new ParserException("invalid rule syntax");
-
-
-                case ResultFact:
-                    if (rule.charAt(currentPos) == ' ') {
-                        state = ResultFactState.EOL;
-                        break;
-                    }
-                    if (!Character.isLetterOrDigit(rule.charAt(currentPos)) && rule.charAt(currentPos) != '_') {
-                        throw new ParserException("invalid rule syntax");
-                    }
-                    fact.append(rule.charAt(currentPos));
+                    fact.append(currentChar);
                     break;
 
 
                 case EOL:
-                    if (rule.charAt(currentPos) == ' ') {
+                    if (currentChar == ' ') {
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException("invalid rule syntax: error in end of rule");
             }
         }
-        if (state != ResultFactState.ResultFact && state != ResultFactState.EOL) {
+        if (state != RuleState.Fact && state != RuleState.EOL) {
             throw new ParserException("invalid rule syntax");
         }
 
-        //System.out.println(fact.toString());
         return new Rule(resultExpression, fact.toString());
     }
-
 
     private List<String> parseKnownFacts(String factsString) throws ParserException {
 
