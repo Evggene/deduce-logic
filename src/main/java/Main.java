@@ -1,15 +1,13 @@
-import model.logic.ConsoleLogic;
-import view.ConsoleView;
-
-import java.util.*;
-
-
 public class Main {
 
     public static void main(String[] args) {
 
-        Collection<String> resultsList = new ConsoleLogic(args).makeResults();
+        if (args == null || args.length == 0) {
+            System.out.print("Missing argument");
+            return;
+        }
 
-        new ConsoleView(resultsList).viewResults();
+        new Deduction(args[0]).deduce();
+
     }
 }

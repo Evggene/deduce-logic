@@ -8,6 +8,8 @@ import model.expression.FactExpression;
 import model.expression.OrExpression;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,11 +35,11 @@ public class Parser {
     }
 
     enum KnownFactsState {
-        BeforeFact, Fact, UnderscoreFact, EOL
+        BeforeFact, UnderscoreFact, Fact, EOL
     }
 
 
-    public Model parse(String path) throws Exception {
+    public Model parse(String path) {
 
         Collection<Rule> rulesList = new ArrayList<>();
         Set<String> resultsList = new HashSet<>();
@@ -77,7 +79,17 @@ public class Parser {
             if (rulesList.isEmpty()) {
                 throw new ParserException("missing rules");
             }
+        } catch (FileNotFoundException e) {
+            System.out.print("Wrong argument: file not found");
+        } catch (IOException e) {
+            System.out.print("Error when reading file: " + e.getMessage());
+        } catch (ParserException e) {
+            System.out.print("Invalid file: " + e.getMessage());
+            resultsList = new HashSet<>();
+        } catch (Exception e) {
+            System.out.print("Unknown error: " + "wrong syntax in file");
         }
+
         return new Model(rulesList, resultsList);
     }
 

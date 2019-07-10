@@ -24,7 +24,7 @@ public class Tests extends Assert {
 
 
     @Test
-    public void test1() {                           // валидный файл, тест на логику
+    public void test1() throws Exception {                           // валидный файл, тест на логику
 
         File s = new File(getClass().getResource("first.txt").getFile());
         Main.main(new String[]{s.getAbsolutePath()});
