@@ -1,4 +1,6 @@
-import model.Conversion;
+import conversion.Conversion;
+import conversion.ConversionInTxt;
+import conversion.ConversionInXml;
 import model.Model;
 import org.xml.sax.SAXException;
 import parcer.ParserTxt;
@@ -23,10 +25,10 @@ public class Deduction {
     }
 
     public void deduce() {
-
         Collection<String> resultsList;
         try {
-            resultsList = doModel().deduce();
+            model = modelFabric();
+            resultsList = model.deduce();
         } catch (FileNotFoundException e) {
             System.out.print("Wrong argument: file not found");
             return;
@@ -55,17 +57,17 @@ public class Deduction {
 
     public void convert() {
         try {
-            Model model = doModel();
-            Conversion conversion = new Conversion(model);
-            conversion.convertXmlToTxt(arguments[2]);
+            model = modelFabric();
+            Conversion conversion = conversionFabric();
+            conversion.convert(arguments[2]);
         } catch (IOException e) {
             System.out.println("Invalid argument: " + e.getMessage());
             return;
         } catch (SAXException e) {
-            System.out.println("Invalid file syntax");
+            System.out.println("Invalid file syntax: " + e.getMessage());
             return;
         } catch (JAXBException e) {
-            System.out.println("Invalid file syntax");
+            System.out.println("Invalid file syntax: " + e.getMessage());
             return;
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +75,7 @@ public class Deduction {
         }
     }
 
-    private Model doModel() throws Exception {
+    private Model modelFabric() throws Exception {
         if (arguments[1].equalsIgnoreCase("-t")) {
             ParserTxt engine = new ParserTxt();
             model = engine.parse(arguments[0]);
@@ -84,6 +86,17 @@ public class Deduction {
             throw new ParserException(0, "Wrong key");
         }
         return model;
+    }
+
+
+    private Conversion conversionFabric() {
+        Conversion conversion = null;
+        if (arguments[1].equalsIgnoreCase("-t")) {
+            conversion = new ConversionInXml(model);
+        } else if (arguments[1].equalsIgnoreCase("-x")) {
+            conversion = new ConversionInTxt(model);
+        }
+        return conversion;
     }
 
 

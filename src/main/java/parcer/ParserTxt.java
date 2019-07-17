@@ -296,7 +296,9 @@ public class ParserTxt {
         if (state != RuleState.Fact && state != RuleState.EOL) {
             throw new ParserException(currentLine, "invalid rule syntax");
         }
-       // System.out.println(resultExpression);
+
+// PRINT
+        System.out.println(resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 

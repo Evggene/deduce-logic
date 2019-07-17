@@ -36,27 +36,11 @@ public class Rule {
             }
         }
 
-    @Override
-    public String toString() {
-        return "Rule{" +
-                "expression=" + expression +
-                ", resultFact='" + resultFact + '\'' +
-                '}';
-    }
-
     public Expression getExpression() {
         return expression;
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
-    }
-
     public String getResultFact() {
         return resultFact;
-    }
-
-    public void setResultFact(String resultFact) {
-        this.resultFact = resultFact;
     }
 }

@@ -1,8 +1,7 @@
 package model.expression;
 
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Collectors;
@@ -15,6 +14,7 @@ public class AndExpression implements Expression{
             @XmlElement(name = "or", type = OrExpression.class),
             @XmlElement(name = "and", type = AndExpression.class),
     })
+
     private Collection<Expression> expressions;
 
     public AndExpression() {
@@ -34,24 +34,13 @@ public class AndExpression implements Expression{
         return true;
     }
 
-
-
+    @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-        for (Iterator<Expression> iterator = expressions.iterator(); iterator.hasNext(); ) {
-            Expression expression = iterator.next();
-            if (!(expression instanceof FactExpression)) {
-                result.append("(" + expression + ")");
-            }
-            else {
-                result.append(expression);
-            }
-            if (!iterator.hasNext()) {
-                break;
-            }
-            result.append( " && ");
-        }
-        String sb = result.toString();
-        return sb;
+        return "And" +
+                expressions;
+    }
+
+    public Collection<Expression> getExpressions() {
+        return expressions;
     }
 }

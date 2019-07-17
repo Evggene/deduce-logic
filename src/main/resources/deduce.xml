@@ -15,6 +15,9 @@
             </or>
             </and>
         </rule>
+        <rule resultFact="A">
+                <fact fact="B"/>
+        </rule>
     </rules>
 
     <knownFacts>

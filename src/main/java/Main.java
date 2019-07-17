@@ -9,12 +9,18 @@ public class Main {
             System.out.print("Missing argument");
             return;
         }
+        if (args.length > 3) {
+            System.out.println("Too many arguments");
+        }
 
-        if (args.length == 3 && !args[2].isEmpty()) {
-            File file = new File(args[2]);
-            if (file.exists()) {
-                if (file.isFile()) {
+        if (args.length == 3) {
+            File arg = new File(args[2]);
+            if (arg.exists()) {
+                if (arg.isFile()) {
                     System.out.println("File with current name is exist, choose new file name");
+                    return;
+                } else {
+                    System.out.println("Invalid third argument");
                     return;
                 }
             }
@@ -25,7 +31,5 @@ public class Main {
             Deduction engine = new Deduction(args);
             engine.deduce();
         }
-
     }
-
 }

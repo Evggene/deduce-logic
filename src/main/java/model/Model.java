@@ -2,8 +2,6 @@
 
 package model;
 
-import com.sun.xml.internal.txw2.annotation.XmlNamespace;
-
 import javax.xml.bind.annotation.*;
 import java.util.Collection;
 import java.util.Iterator;
@@ -45,15 +43,7 @@ public class Model {
         return rulesList;
     }
 
-    public void setRulesList(Collection<Rule> rulesList) {
-        this.rulesList = rulesList;
-    }
-
     public Set<String> getKnownFactsList() {
         return knownFactsList;
-    }
-
-    public void setKnownFactsList(Set<String> knownFactsList) {
-        this.knownFactsList = knownFactsList;
     }
 }

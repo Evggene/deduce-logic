@@ -23,6 +23,11 @@ public class FactExpression implements Expression {
     }
 
     @Override
+    public Collection<Expression> getExpressions() {
+        return null;
+    }
+
+    @Override
     public String toString() {
         return fact;
     }

@@ -33,19 +33,13 @@ public class OrExpression implements Expression {
         return false;
     }
 
-
-
+    @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-        for (Iterator<Expression> iterator = expressions.iterator(); iterator.hasNext(); ) {
-            Expression expression = iterator.next();
-                result.append(expression);
-            if (!iterator.hasNext()) {
-                break;
-            }
-            result.append( " || ");
-        }
-        String sb = result.toString();
-        return sb;
+        return "Or" +
+                 expressions ;
+    }
+
+    public Collection<Expression> getExpressions() {
+        return expressions;
     }
 }
