@@ -3,7 +3,7 @@ package parcer;
 public class ParserException extends Exception{
 
 
-    public ParserException(String message) {
-        super(message);
+    public ParserException(int errorLine, String message) {
+        super("Error in line " + errorLine + ": " + message);
     }
 }

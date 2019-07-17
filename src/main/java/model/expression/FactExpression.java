@@ -1,11 +1,17 @@
 package model.expression;
 
+import javax.xml.bind.annotation.*;
 import java.util.Collection;
 
 
 public class FactExpression implements Expression {
 
+
+    @XmlAttribute()
     private String fact;
+
+    public FactExpression() {
+    }
 
     public FactExpression(String fact) {
         this.fact = fact;

@@ -8,17 +8,16 @@ import model.expression.FactExpression;
 import model.expression.OrExpression;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
 
-public class Parser {
+public class ParserTxt {
 
     private int currentPos = 0;
+    private int currentLine = 0;
 
     enum FileState {
         RULE, KNOWN_FACTS, EOF
@@ -39,7 +38,7 @@ public class Parser {
     }
 
 
-    public Model parse(String path) {
+    public Model parse(String path) throws Exception {
 
         Collection<Rule> rulesList = new ArrayList<>();
         Set<String> resultsList = new HashSet<>();
@@ -51,8 +50,8 @@ public class Parser {
             FileState fileState = FileState.RULE;
 
             while ((readLine = br.readLine()) != null) {
+                currentLine++;
                 switch (fileState) {
-
                     case RULE:
                         if (readLine.equals(separator)) {
                             fileState = FileState.KNOWN_FACTS;
@@ -67,29 +66,19 @@ public class Parser {
                         break;
 
                     case EOF:
-                        throw new ParserException("invalid file");
+                        throw new ParserException(currentLine, "invalid file");
                 }
             }
             if (fileState == FileState.RULE) {
-                throw new ParserException("missing or wrong separator");
+                throw new ParserException(currentLine, "missing or wrong separator");
             }
             if (fileState == FileState.KNOWN_FACTS) {
-                throw new ParserException("missing known facts");
+                throw new ParserException(currentLine, "missing known facts");
             }
             if (rulesList.isEmpty()) {
-                throw new ParserException("missing rules");
+                throw new ParserException(currentLine, "missing rules");
             }
-        } catch (FileNotFoundException e) {
-            System.out.print("Wrong argument: file not found");
-        } catch (IOException e) {
-            System.out.print("Error when reading file: " + e.getMessage());
-        } catch (ParserException e) {
-            System.out.print("Invalid file: " + e.getMessage());
-            resultsList = new HashSet<>();
-        } catch (Exception e) {
-            System.out.print("Unknown error: " + "wrong syntax in file");
         }
-
         return new Model(rulesList, resultsList);
     }
 
@@ -121,7 +110,7 @@ public class Parser {
                         state = ExpressionState.BeforeOperator;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException(currentLine, "invalid rule syntax");
 
 
                 case UnderscoreFact:
@@ -134,7 +123,7 @@ public class Parser {
                         state = ExpressionState.Fact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax: wrong symbols");
+                    throw new ParserException(currentLine, "invalid rule syntax (wrong symbols)");
 
                 case Fact:
                     if (currentChar == '-') {
@@ -164,7 +153,7 @@ public class Parser {
                         return assembleExpression(orElements, andElements, currentExpression);
                     }
                     if (!Character.isLetterOrDigit(currentChar) && currentChar != '_') {
-                        throw new ParserException("invalid rule syntax: wrong symbols");
+                        throw new ParserException(currentLine, "invalid rule syntax (wrong symbols)");
                     }
                     fact.append(currentChar);
                     break;
@@ -188,7 +177,7 @@ public class Parser {
                     if (currentChar == ')') {
                         return assembleExpression(orElements, andElements, currentExpression);
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException(currentLine, "invalid rule syntax");
 
 
                 case AndOperator:
@@ -197,7 +186,7 @@ public class Parser {
                         state = ExpressionState.BeforeFact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax: wrong operator");
+                    throw new ParserException(currentLine, "invalid rule syntax (wrong operator)");
 
 
                 case OrOperator:
@@ -211,10 +200,10 @@ public class Parser {
                         state = ExpressionState.BeforeFact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax: wrong operator");
+                    throw new ParserException(currentLine, "invalid rule syntax (wrong operator)");
             }
         }
-        throw new ParserException("invalid rule syntax");
+        throw new ParserException(currentLine, "invalid rule syntax)");
     }
 
     private Expression assembleExpression(ArrayList<Expression> orElements, ArrayList<Expression> andElements, Expression currentExpression) {
@@ -247,14 +236,14 @@ public class Parser {
                         state = RuleState.Imply;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException(currentLine, "invalid rule syntax");
                     
                 case Imply:
                     if (currentChar == '>') {
                         state = RuleState.BeforeFact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax");
+                    throw new ParserException(currentLine, "invalid rule syntax");
 
                 case BeforeFact:
                     if (currentChar == ' ') {
@@ -270,7 +259,7 @@ public class Parser {
                         state = RuleState.UnderscoreFact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax: wrong symbol in deducing fact");
+                    throw new ParserException(currentLine, "invalid rule syntax (wrong symbol in deducing fact)");
 
                 case UnderscoreFact:
                     if (currentChar == '_') {
@@ -282,7 +271,7 @@ public class Parser {
                         state = RuleState.Fact;
                         break;
                     }
-                    throw new ParserException("invalid rule syntax: wrong symbol in deducing fact");
+                    throw new ParserException(currentLine, "invalid rule syntax (wrong symbol in deducing fact)");
 
 
                 case Fact:
@@ -291,7 +280,7 @@ public class Parser {
                         break;
                     }
                     if (!Character.isLetterOrDigit(currentChar) && currentChar != '_') {
-                        throw new ParserException("invalid rule syntax: wrong symbol in deducing fact");
+                        throw new ParserException(currentLine, "invalid rule syntax (wrong symbol in deducing fact)");
                     }
                     fact.append(currentChar);
                     break;
@@ -301,13 +290,13 @@ public class Parser {
                     if (currentChar == ' ') {
                         break;
                     }
-                    throw new ParserException("invalid rule syntax: error in end of rule");
+                    throw new ParserException(currentLine, "invalid rule syntax (error in end of rule)");
             }
         }
         if (state != RuleState.Fact && state != RuleState.EOL) {
-            throw new ParserException("invalid rule syntax");
+            throw new ParserException(currentLine, "invalid rule syntax");
         }
-
+       // System.out.println(resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 
@@ -335,7 +324,7 @@ public class Parser {
                         state = KnownFactsState.UnderscoreFact;
                         break;
                     }
-                    throw new ParserException("error with known facts");
+                    throw new ParserException(currentLine, "error with known facts");
 
                 case UnderscoreFact:
                     if (factsString.charAt(i) == '_') {
@@ -347,7 +336,7 @@ public class Parser {
                         state = KnownFactsState.Fact;
                         break;
                     }
-                    throw new ParserException("error with known facts");
+                    throw new ParserException(currentLine, "error with known facts");
 
                 case Fact:
                     if (factsString.charAt(i) == ' ') {
@@ -364,7 +353,7 @@ public class Parser {
                         fact.append(factsString.charAt(i));
                         break;
                     }
-                    throw new ParserException("error with known facts");
+                    throw new ParserException(currentLine, "error with known facts");
 
 
                 case EOL:
@@ -377,16 +366,16 @@ public class Parser {
                         state = KnownFactsState.BeforeFact;
                         break;
                     }
-                    throw new ParserException("error with known facts");
+                    throw new ParserException(currentLine, "error with known facts");
             }
         }
         if (!fact.toString().trim().isEmpty())
             knownFactsList.add(fact.toString().trim());
 
         if (state != KnownFactsState.Fact && state != KnownFactsState.EOL)
-            throw new ParserException("error with known facts");
+            throw new ParserException(currentLine, "error with known facts");
         if (knownFactsList.isEmpty()) throw new
-                ParserException("empty known facts");
+                ParserException(currentLine, "empty known facts");
 
         return knownFactsList;
     }
