@@ -1,17 +1,16 @@
-package model;
+package deduction.model;
 
-import model.expression.AndExpression;
-import model.expression.Expression;
-import model.expression.FactExpression;
-import model.expression.OrExpression;
+import deduction.model.expression.AndExpression;
+import deduction.model.expression.Expression;
+import deduction.model.expression.FactExpression;
+import deduction.model.expression.OrExpression;
 
 import javax.xml.bind.annotation.*;
 import java.util.Collection;
 
 
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Rule {
 
+public class Rule {
 
     @XmlElements({
             @XmlElement(name = "fact", type = FactExpression.class),

@@ -1,15 +1,13 @@
 
 
-package model;
+package deduction.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 
 
 @XmlRootElement(name="deduce")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Model {
 
     @XmlElementWrapper(name = "rules")
@@ -27,13 +25,12 @@ public class Model {
         this.knownFactsList = knownFactsList;
     }
 
-
     public Collection<String> deduce() {
         int knownFactsSize = 0;
         while (knownFactsSize != knownFactsList.size()) {
             knownFactsSize = knownFactsList.size();
-            for (Iterator<Rule> iter = rulesList.iterator(); iter.hasNext(); ) {
-                iter.next().calculate(knownFactsList);
+            for (Rule aRulesList : rulesList) {
+                aRulesList.calculate(knownFactsList);
             }
         }
         return knownFactsList;

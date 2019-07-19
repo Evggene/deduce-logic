@@ -1,11 +1,11 @@
-package parcer;
+package deduction.parser;
 
-import model.Model;
-import model.Rule;
-import model.expression.AndExpression;
-import model.expression.Expression;
-import model.expression.FactExpression;
-import model.expression.OrExpression;
+import deduction.model.Model;
+import deduction.model.Rule;
+import deduction.model.expression.AndExpression;
+import deduction.model.expression.Expression;
+import deduction.model.expression.FactExpression;
+import deduction.model.expression.OrExpression;
 
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
@@ -14,8 +14,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-public class ParserTxt {
+public class ParserTxt implements Parser{
 
+    public static final String separator = "----------------------------------------------------------------";
     private int currentPos = 0;
     private int currentLine = 0;
 
@@ -38,13 +39,13 @@ public class ParserTxt {
     }
 
 
-    public Model parse(String path) throws Exception {
+    public Model parse(String filename) throws Exception {
 
         Collection<Rule> rulesList = new ArrayList<>();
         Set<String> resultsList = new HashSet<>();
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(path), Charset.forName("UTF-8"))) {
-            String separator = "----------------------------------------------------------------";
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(filename), Charset.forName("UTF-8"))) {
+
             String readLine;
 
             FileState fileState = FileState.RULE;
@@ -298,7 +299,7 @@ public class ParserTxt {
         }
 
 // PRINT
-        System.out.println(resultExpression);
+        //System.out.println(resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 
