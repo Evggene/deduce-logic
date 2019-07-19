@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<deduce xmlns="http://uniquNamespace/deduce">
+    <rules>
+        <rule resultFact="H">
+            <fact fact="A"/>
+        </rule>
+        <rule resultFact="H1">
+            <and>
+                <fact fact="A"/>
+                <fact fact="H"/>
+            </and>
+        </rule>
+        <rule resultFact="H3">
+            <or>
+                <fact fact="A"/>
+                <and>
+                    <fact fact="B"/>
+                    <fact fact="C"/>
+                </and>
+            </or>
+        </rule>
+        <rule resultFact="H5">
+            <and>
+                <or>
+                    <fact fact="A"/>
+                    <fact fact="B"/>
+                </or>
+                <or>
+                    <fact fact="A"/>
+                    <fact fact="C"/>
+                </or>
+            </and>
+        </rule>
+        <rule resultFact="H6">
+            <or>
+                <or>
+                    <fact fact="A"/>
+                    <fact fact="B"/>
+                </or>
+                <and>
+                    <and>
+                        <fact fact="A"/>
+                        <fact fact="H5"/>
+                    </and>
+                    <fact fact="H3"/>
+                </and>
+            </or>
+        </rule>
+        <rule resultFact="H7">
+            <or>
+                <and>
+                    <or>
+                        <fact fact="A"/>
+                        <fact fact="B"/>
+                    </or>
+                    <fact fact="C"/>
+                </and>
+                <fact fact="H5"/>
+            </or>
+        </rule>
+        <rule resultFact="H8">
+            <or>
+                <fact fact="B"/>
+                <and>
+                    <fact fact="D"/>
+                    <or>
+                        <fact fact="A"/>
+                        <and>
+                            <fact fact="B"/>
+                            <fact fact="C"/>
+                        </and>
+                    </or>
+                </and>
+            </or>
+        </rule>
+    </rules>
+    <knownFacts>
+        <fact>A</fact>
+    </knownFacts>
+</deduce>

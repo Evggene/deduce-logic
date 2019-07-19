@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+
+<deduce xmlns="http://uniquNamespace/deduce">
+    <rules>
+        <rule resultFact="A">
+            <and>
+				<fact fact="B"/>
+					<or>
+						<fact fact="C"/>
+							<and>
+								<fact fact="D"/>
+									<or>
+										<fact fact="G"/>
+										<fact fact="H"/>
+									</or>
+							</and>
+					</or>
+            </and>
+			
+        </rule>
+        <rule resultFact="A">
+            <and>
+				<fact fact="B"/>
+					<or>
+						<fact fact="C"/>
+							<and>
+								<fact fact="D"/>
+									<or>
+										<fact fact="G"/>
+										<fact fact="H"/>
+									</or>
+							</and>
+					</or>
+            </and>
+			
+        </rule>
+    </rules>
+
+    <knownFacts>
+        <fact>B</fact>
+        <fact>C</fact>
+    </knownFacts>
+
+
+</deduce>
