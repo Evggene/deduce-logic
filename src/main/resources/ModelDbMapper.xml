@@ -1,0 +1,17 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="deduction.db.ModelDBMapper">
+
+    <select id="getModelById" parameterType="int" resultType="deduction.db.domains.ModelDB">
+        select * from model where id=#{id}
+    </select>
+
+    <insert id="insertNameInModel" parameterType="java.lang.String">
+      INSERT INTO model (name) VALUES(#{name})
+    </insert>
+
+    <select id="getModelByName" parameterType="java.lang.String" resultType="deduction.db.domains.ModelDB">
+        select * from model where name=#{name}
+    </select>
+
+</mapper>

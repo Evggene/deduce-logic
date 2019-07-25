@@ -4,6 +4,7 @@ import deduction.model.expression.AndExpression;
 import deduction.model.expression.Expression;
 import deduction.model.expression.FactExpression;
 import deduction.model.expression.OrExpression;
+import lombok.Getter;
 
 import javax.xml.bind.annotation.*;
 import java.util.Collection;
@@ -17,9 +18,9 @@ public class Rule {
             @XmlElement(name = "or", type = OrExpression.class),
             @XmlElement(name = "and", type = AndExpression.class),
     })
-    private Expression expression;
+    private @Getter Expression expression;
     @XmlAttribute()
-    private String resultFact;
+    private @Getter String resultFact;
 
     public Rule() {
     }
@@ -35,11 +36,4 @@ public class Rule {
             }
         }
 
-    public Expression getExpression() {
-        return expression;
-    }
-
-    public String getResultFact() {
-        return resultFact;
-    }
 }

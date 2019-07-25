@@ -42,7 +42,7 @@ public class WriterTxt implements Writer {
 
     private String serializeExpression(Rule rule) {
         StringBuilder sb = new StringBuilder();
-        if (rule.getExpression() instanceof FactExpression) {
+        if (rule.getExpression().getStringPresentation().equals("Fact")) {
             return rule.getExpression().toString();
         }
         return serializeExpression(rule.getExpression(), sb);
@@ -50,18 +50,18 @@ public class WriterTxt implements Writer {
 
     private String serializeExpression(Expression ex, StringBuilder sb) {
 
-        if (ex instanceof AndExpression) {
+        if (ex.getStringPresentation().equals("And")) {
             StringBuilder result = new StringBuilder();
             for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
                 Expression expression = iterator.next();
-                if (expression instanceof OrExpression) {
+                if (expression.getStringPresentation().equals("Or")) {
                     result.append("(");
                     serializeExpression(expression, sb.append(result));
                     sb.append(")");
                     result = new StringBuilder();
                     break;
                 }
-                if (expression instanceof AndExpression) {
+                if (expression.getStringPresentation().equals("And")) {
                     result.append(serializeExpression(expression, sb.append(result)));
                     result = new StringBuilder();
                     break;
@@ -75,11 +75,11 @@ public class WriterTxt implements Writer {
             }
             sb.append(result);
         }
-        if (ex instanceof OrExpression) {
+        if (ex.getStringPresentation().equals("Or")) {
             StringBuilder result = new StringBuilder();
             for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
                 Expression expression = iterator.next();
-                if (!(expression instanceof FactExpression)) {
+                if (!expression.getStringPresentation().equals("Fact")) {
                     result.append(serializeExpression(expression, sb.append(result)));
                     result = new StringBuilder();
                     break;

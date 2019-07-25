@@ -9,7 +9,8 @@ public class FactExpression implements Expression {
     @XmlAttribute()
     private String fact;
 
-    public FactExpression() {}
+    public FactExpression() {
+    }
 
     public FactExpression(String fact) {
         this.fact = fact;
@@ -17,12 +18,17 @@ public class FactExpression implements Expression {
 
     @Override
     public boolean calculate(Collection<String> knownFacts) {
-     return knownFacts.contains(fact);
+        return knownFacts.contains(fact);
     }
 
     @Override
     public Collection<Expression> getExpressions() {
         return null;
+    }
+
+    @Override
+    public String getStringPresentation() {
+        return "Fact";
     }
 
     @Override

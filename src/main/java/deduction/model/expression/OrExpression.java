@@ -14,7 +14,8 @@ public class OrExpression implements Expression {
     })
     private Collection<Expression> expressions;
 
-    public OrExpression() {}
+    public OrExpression() {
+    }
 
     public OrExpression(Collection<Expression> expressions) {
         this.expressions = expressions;
@@ -30,12 +31,18 @@ public class OrExpression implements Expression {
         return false;
     }
 
-    @Override
-    public String toString() {
-        return "Or" + expressions;
-    }
 
     public Collection<Expression> getExpressions() {
         return expressions;
+    }
+
+    @Override
+    public String getStringPresentation() {
+        return "Or";
+    }
+
+    @Override
+    public String toString() {
+        return "Or{" + expressions + '}';
     }
 }

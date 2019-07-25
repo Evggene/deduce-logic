@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.*;
 import java.util.Collection;
 
 
-public class AndExpression implements Expression{
+public class AndExpression implements Expression {
 
     @XmlElements({
             @XmlElement(name = "fact", type = FactExpression.class),
@@ -15,7 +15,8 @@ public class AndExpression implements Expression{
 
     private Collection<Expression> expressions;
 
-    public AndExpression() {}
+    public AndExpression() {
+    }
 
     public AndExpression(Collection<Expression> expressions) {
         this.expressions = expressions;
@@ -32,11 +33,16 @@ public class AndExpression implements Expression{
     }
 
     @Override
-    public String toString() {
-        return "And" + expressions;
+    public String getStringPresentation() {
+        return "And";
     }
 
     public Collection<Expression> getExpressions() {
         return expressions;
+    }
+
+    @Override
+    public String toString() {
+        return "And{" + expressions + '}';
     }
 }

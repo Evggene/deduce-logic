@@ -7,4 +7,5 @@ public interface Expression {
 
     boolean calculate(Collection<String> knownFacts);
     Collection<Expression> getExpressions();
+    String getStringPresentation();
 }

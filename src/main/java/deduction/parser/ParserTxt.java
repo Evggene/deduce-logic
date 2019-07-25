@@ -299,7 +299,7 @@ public class ParserTxt implements Parser{
         }
 
 // PRINT
-        //System.out.println(resultExpression);
+        System.out.println("parser txt " + resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 

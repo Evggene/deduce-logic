@@ -1,0 +1,10 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="deduction.db.RulesDBMapper">
+
+    <insert id="insertRulesDB" parameterType="deduction.db.domains.RulesDB" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+        INSERT INTO rules (result_fact, ref_model) VALUES(#{result_fact}, #{ref_model})
+    </insert>
+
+</mapper>
+

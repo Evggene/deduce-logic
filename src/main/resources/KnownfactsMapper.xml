@@ -1,0 +1,9 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="deduction.db.KnownfactsMapper">
+
+    <insert id="insertKnownFacts" parameterType="deduction.db.domains.Knownfacts">
+        INSERT INTO knownfacts (ref_model, fact) VALUES(#{ref_model}, #{fact})
+    </insert>
+
+</mapper>

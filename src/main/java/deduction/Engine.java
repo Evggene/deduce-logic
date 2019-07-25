@@ -1,21 +1,17 @@
 package deduction;
 
-import deduction.parser.ParserTxt;
-import deduction.parser.ParserXml;
+import deduction.parser.*;
 import deduction.writer.Writer;
 import deduction.model.Model;
+import deduction.writer.WriterDB;
 import deduction.writer.WriterTxt;
 import deduction.writer.WriterXml;
-import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
-import deduction.parser.Parser;
-import deduction.parser.ParserException;
 
 import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -23,8 +19,9 @@ import java.util.Iterator;
 public class Engine {
 
     public enum FormatEnum {
-        TXT, XML
+        TXT, XML, DB
     }
+
 
     public void deduce(String file, FormatEnum fmt) {
         Model model;
@@ -44,6 +41,7 @@ public class Engine {
             System.out.print(e.getMessage());
             return;
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.print("Error: " + e.getMessage());
             return;
         }
@@ -64,6 +62,8 @@ public class Engine {
                 return new ParserTxt();
             case XML:
                 return new ParserXml();
+            case DB:
+                return new ParserDB();
             default:
                 throw new Exception("Unknown parser format");
         }
@@ -80,7 +80,8 @@ public class Engine {
             try {
                 parser = createParser(fmtin);
                 model = parser.parse(inputFile);
-                Writer writer = createWriter(fmtin);
+
+                Writer writer = createWriter(fmtout);
                 writer.convert(outputFile, model);
                 System.out.print("Conversion is done");
             } catch (IOException e) {
@@ -99,12 +100,16 @@ public class Engine {
     private Writer createWriter(FormatEnum fmt) throws Exception {
         switch (fmt) {
             case TXT:
-                return new WriterXml();
-            case XML:
                 return new WriterTxt();
+            case XML:
+                return new WriterXml();
+            case DB:
+                return new WriterDB();
             default:
                 throw new Exception("Unknown parser format");
         }
     }
 
 }
+
+
