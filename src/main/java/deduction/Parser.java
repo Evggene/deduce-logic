@@ -1,4 +1,4 @@
-package deduction.parser;
+package deduction;
 
 import deduction.model.Model;
 

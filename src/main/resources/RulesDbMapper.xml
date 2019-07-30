@@ -1,10 +1,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.db.RulesDBMapper">
+<mapper namespace="deduction.dto.RulesDTOMapper">
 
-    <insert id="insertRulesDB" parameterType="deduction.db.domains.RulesDB" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+    <insert id="insertRulesDB" parameterType="deduction.dto.domains.RulesDTO" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
         INSERT INTO rules (result_fact, ref_model) VALUES(#{result_fact}, #{ref_model})
     </insert>
 
-</mapper>
+    <select id="getRulesByModelName" parameterType="java.lang.String" resultType="deduction.dto.domains.RulesDTO">
+        SELECT id, result_fact FROM rules where ref_model = (select id from model where name = #{name})
+    </select>
 
+    <delete id="deleteRules" parameterType="int">
+        DELETE FROM rules WHERE id=#{id}
+    </delete>
+
+</mapper>

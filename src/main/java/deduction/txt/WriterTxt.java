@@ -1,12 +1,9 @@
-package deduction.writer;
+package deduction.txt;
 
 import deduction.model.Model;
 import deduction.model.Rule;
-import deduction.model.expression.AndExpression;
 import deduction.model.expression.Expression;
-import deduction.model.expression.FactExpression;
-import deduction.model.expression.OrExpression;
-import deduction.parser.ParserTxt;
+import deduction.Writer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,7 +42,10 @@ public class WriterTxt implements Writer {
         if (rule.getExpression().getStringPresentation().equals("Fact")) {
             return rule.getExpression().toString();
         }
-        return serializeExpression(rule.getExpression(), sb);
+        String s = serializeExpression(rule.getExpression(), sb);
+    //PRINT
+       // System.out.println(s);
+        return s;
     }
 
     private String serializeExpression(Expression ex, StringBuilder sb) {
@@ -59,20 +59,20 @@ public class WriterTxt implements Writer {
                     serializeExpression(expression, sb.append(result));
                     sb.append(")");
                     result = new StringBuilder();
-                    break;
                 }
                 if (expression.getStringPresentation().equals("And")) {
                     result.append(serializeExpression(expression, sb.append(result)));
                     result = new StringBuilder();
-                    break;
-                } else {
-                    result.append(expression);
                 }
+                if (expression.getStringPresentation().equals("Fact"))
+                    result.append(expression);
+
                 if (!iterator.hasNext()) {
                     break;
                 }
                 result.append(" && ");
             }
+
             sb.append(result);
         }
         if (ex.getStringPresentation().equals("Or")) {
@@ -82,7 +82,6 @@ public class WriterTxt implements Writer {
                 if (!expression.getStringPresentation().equals("Fact")) {
                     result.append(serializeExpression(expression, sb.append(result)));
                     result = new StringBuilder();
-                    break;
                 } else {
                     result.append(expression);
                 }

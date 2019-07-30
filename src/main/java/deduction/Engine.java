@@ -1,19 +1,24 @@
 package deduction;
 
-import deduction.parser.*;
-import deduction.writer.Writer;
+import deduction.db.ParserDB;
+import deduction.txt.ParserTxt;
 import deduction.model.Model;
-import deduction.writer.WriterDB;
-import deduction.writer.WriterTxt;
-import deduction.writer.WriterXml;
+import deduction.db.WriterDB;
+import deduction.txt.WriterTxt;
+import deduction.xml.ParserXml;
+import deduction.xml.WriterXml;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
+import java.io.*;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Properties;
 
 
 public class Engine {
@@ -22,6 +27,17 @@ public class Engine {
         TXT, XML, DB
     }
 
+
+    private SqlSessionFactory ssf;
+
+
+     public void createSqlSessionFactory(String filename) {
+         try {
+             ssf = new SqlSessionFactoryBuilder().build(new FileReader(filename));
+         } catch (FileNotFoundException e) {
+             System.out.println(e.getMessage());
+         }
+     }
 
     public void deduce(String file, FormatEnum fmt) {
         Model model;
@@ -32,17 +48,16 @@ public class Engine {
             model = parser.parse(file);
             resultsList = model.deduce();
         } catch (FileNotFoundException e) {
-            System.out.print("Wrong argument: file not found");
+            System.err.print("Wrong argument: file not found");
             return;
         } catch (IOException e) {
-            System.out.print("Error when reading file: " + e.getMessage());
+            System.err.print("Error when reading file: " + e.getMessage());
             return;
         } catch (ParserException e) {
-            System.out.print(e.getMessage());
+            System.err.print(e.getMessage());
             return;
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.print("Error: " + e.getMessage());
+            System.err.print("Error: " + e.getMessage());
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -63,7 +78,7 @@ public class Engine {
             case XML:
                 return new ParserXml();
             case DB:
-                return new ParserDB();
+                return new ParserDB(ssf);
             default:
                 throw new Exception("Unknown parser format");
         }
@@ -75,7 +90,7 @@ public class Engine {
         Parser parser;
 
         if (fmtin == fmtout) {
-            System.out.println("Error: format input file and format output file are the same");
+            System.err.println("Error: format input file and format output file are the same");
         } else
             try {
                 parser = createParser(fmtin);
@@ -85,14 +100,13 @@ public class Engine {
                 writer.convert(outputFile, model);
                 System.out.print("Conversion is done");
             } catch (IOException e) {
-                System.out.println("Invalid argument: " + e.getMessage());
+                System.err.print("Invalid argument: " + e.getMessage());
             } catch (SAXException e) {
-                System.out.println("Invalid file syntax: " + e.getMessage());
+                System.err.print("Invalid file syntax: " + e.getMessage());
             } catch (JAXBException e) {
-                System.out.println("Invalid file syntax: " + e.getMessage());
+                System.err.print("Invalid file syntax: " + e.getMessage());
             } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Unknown error: " + e.getMessage());
+                System.err.print(e.getCause().getMessage().substring(0, e.getCause().getMessage().indexOf("\n")));
             }
     }
 
@@ -104,10 +118,20 @@ public class Engine {
             case XML:
                 return new WriterXml();
             case DB:
-                return new WriterDB();
+                return new WriterDB(ssf);
             default:
                 throw new Exception("Unknown parser format");
         }
+    }
+
+    public void deleteDB(String inputFile) {
+        try {
+            WriterDB writer = new WriterDB(ssf);
+            writer.deleteModelDB(inputFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

@@ -1,6 +1,7 @@
-package deduction.parser;
+package deduction.xml;
 
 import deduction.model.Model;
+import deduction.Parser;
 import org.xml.sax.SAXException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -10,7 +11,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 public class ParserXml implements Parser {
 

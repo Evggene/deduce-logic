@@ -1,9 +1,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.db.KnownfactsMapper">
+<mapper namespace="deduction.dto.KnownFactsDTOMapper">
 
-    <insert id="insertKnownFacts" parameterType="deduction.db.domains.Knownfacts">
+    <insert id="insertKnownFacts" parameterType="deduction.dto.domains.KnownFactsDTO">
         INSERT INTO knownfacts (ref_model, fact) VALUES(#{ref_model}, #{fact})
     </insert>
 
+    <!--<select id="getKnownFactsByModelId" parameterType="int" resultType="java.lang.String">-->
+         <!--SELECT fact FROM knownfacts where ref_model = #{ref_model}-->
+    <select id="getKnownFactsByModelName" parameterType="java.lang.String" resultType="java.lang.String">
+        select fact from knownfacts where ref_model = (select id from model where name = #{name});
+    </select>
+
+    <delete id="deleteKnownFacts" parameterType="java.lang.String">
+        DELETE FROM knownfacts WHERE ref_model= (select id from model where name = #{name});
+    </delete>
+
 </mapper>
+
+

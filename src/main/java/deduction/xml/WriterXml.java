@@ -1,7 +1,9 @@
-package deduction.writer;
+package deduction.xml;
 
 
 import deduction.model.Model;
+import deduction.Writer;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;

@@ -1,4 +1,4 @@
-package deduction.writer;
+package deduction;
 
 
 import deduction.model.Model;

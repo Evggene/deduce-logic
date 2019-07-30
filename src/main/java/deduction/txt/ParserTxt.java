@@ -1,4 +1,4 @@
-package deduction.parser;
+package deduction.txt;
 
 import deduction.model.Model;
 import deduction.model.Rule;
@@ -6,6 +6,8 @@ import deduction.model.expression.AndExpression;
 import deduction.model.expression.Expression;
 import deduction.model.expression.FactExpression;
 import deduction.model.expression.OrExpression;
+import deduction.Parser;
+import deduction.ParserException;
 
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
@@ -14,7 +16,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-public class ParserTxt implements Parser{
+public class ParserTxt implements Parser {
 
     public static final String separator = "----------------------------------------------------------------";
     private int currentPos = 0;
@@ -299,7 +301,7 @@ public class ParserTxt implements Parser{
         }
 
 // PRINT
-        System.out.println("parser txt " + resultExpression);
+       // System.out.println("parser txt " + resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 

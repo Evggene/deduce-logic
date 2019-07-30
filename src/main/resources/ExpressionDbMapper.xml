@@ -1,0 +1,17 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="deduction.dto.ExpressionDTOMapper">
+
+    <insert id="insertElement" parameterType="deduction.dto.domains.ExpressionDTO" >
+        INSERT INTO expression (ref_rules, element_num, parent_id, fact, type) VALUES(#{ref_rules}, #{element_num}, #{parent_id}, #{fact}, #{type})
+    </insert>
+
+    <select id="getExpressionByRuleID" parameterType="int" resultType="deduction.dto.domains.ExpressionDTO">
+        SELECT element_num, parent_id, fact, type FROM expression where ref_rules = #{ref_rules}
+    </select>
+
+    <delete id="deleteExpression" parameterType="int">
+        DELETE FROM expression WHERE ref_rules=#{ref_rules}
+    </delete>
+
+</mapper>
