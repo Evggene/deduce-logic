@@ -14,15 +14,12 @@ public class Main {
     public static void main(String[] args) {
 
         if (args.length == 0) {
-            System.err.println("Empty arguments");
+            System.out.println("Empty arguments");
             return;
         }
-
         Options options = new Options();
-
         Option dbin = Option.builder("dbin").hasArg().numberOfArgs(2).build();
         Option dbout = Option.builder("dbout").hasArg().numberOfArgs(2).build();
-
         options
                 .addOption("txtin", true, "input file in txt format")
                 .addOption("txtout", true, "output file in txt format")
@@ -31,21 +28,18 @@ public class Main {
                 .addOption(dbin)
                 .addOption(dbout);
 
-
-        CommandLineParser parser = new DefaultParser();
-        CommandLine line = null;
+        CommandLine line;
         try {
-            line = parser.parse(options, args);
+            line = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
             return;
         }
 
         switch (args[0]) {
-
             case "deduce":
                 if (line.getOptions().length != 1) {
-                    System.err.println("Wrong number of arguments");
+                    System.out.println("Wrong number of arguments");
                     return;
                 }
                 String inputFile;
@@ -67,17 +61,17 @@ public class Main {
                     engine.deduce(s[0], Engine.FormatEnum.DB);
                     return;
                 }
-                System.err.println("Unknown key. Required: '-txtin', '-xmlin', '-dbin'");
+                System.out.println("Unknown key. Required: '-txtin', '-xmlin', '-dbin'");
                 return;
 
 
             case "convert":
                 if (line.getOptions().length != 2) {
-                    System.err.println("Wrong number of arguments");
+                    System.out.println("Wrong number of arguments");
                     return;
                 }
                 inputFile = null;
-                String outputFile = null;
+                String outputFile;
                 Engine.FormatEnum formatInputFile = null;
                 engine = new Engine();
 
@@ -111,13 +105,13 @@ public class Main {
                     engine.convert(inputFile, formatInputFile, s[0], Engine.FormatEnum.DB);
                     return;
                 }
-                System.err.println("Unknown key");
+                System.out.println("Unknown key");
                 return;
 
 
             case "delete":
                 if (line.getOptions().length != 1) {
-                    System.err.println("Wrong number of arguments");
+                    System.out.println("Wrong number of arguments");
                     return;
                 }
                 engine = new Engine();
@@ -128,11 +122,11 @@ public class Main {
                     engine.deleteDB(s[0]);
                     return;
                 }
-                System.err.println("Function 'delete' may be only from data base, therefore necessary key '-dto'");
+                System.out.println("Command 'delete' may have only '-dbin' argument");
                 return;
 
             default:
-                System.err.println("Unknown method. Required: 'deduce', 'convert', 'delete'");
+                System.out.println("Unknown command. Required: 'deduce', 'convert', 'delete'");
         }
 
     }

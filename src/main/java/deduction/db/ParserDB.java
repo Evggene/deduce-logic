@@ -20,9 +20,8 @@ import java.util.*;
 
 public class ParserDB implements Parser {
 
-    private int currentPos = 0;
     private SqlSessionFactory ssf;
-    private int indexOfFactType = 0, indexOfOrType = 0, indexOfAndType = 0;
+    private int currentPos;
 
     public ParserDB(SqlSessionFactory ssf) {
         this.ssf = ssf;
@@ -32,7 +31,6 @@ public class ParserDB implements Parser {
     public Model parse(String modelName) {
 
         try (SqlSession session = ssf.openSession()) {
-            Collection<Rule> rulesList = new ArrayList<>();
 
             KnownFactsDTOMapper factsMapper = session.getMapper(KnownFactsDTOMapper.class);
             Set<String> knownFacts = factsMapper.getKnownFactsByModelName(modelName);
@@ -40,25 +38,13 @@ public class ParserDB implements Parser {
             RulesDTOMapper rulesMapper = session.getMapper(RulesDTOMapper.class);
             List<RulesDTO> rulesDTOList = rulesMapper.getRulesByModelName(modelName);
 
-            TypeOfExpressionDTOMapper toe = session.getMapper(TypeOfExpressionDTOMapper.class);
-            List<TypeOfExpressionDTO> typeOfExpression = toe.getIdByType();
-
-            for (TypeOfExpressionDTO typeOfExpressionDTO : typeOfExpression) {
-                if (typeOfExpressionDTO.getType().equals("fact"))
-                    indexOfFactType = typeOfExpressionDTO.getId();
-                if (typeOfExpressionDTO.getType().equals("or"))
-                    indexOfOrType = typeOfExpressionDTO.getId();
-                if (typeOfExpressionDTO.getType().equals("and"))
-                    indexOfAndType = typeOfExpressionDTO.getId();
-            }
-
+            Collection<Rule> rulesList = new ArrayList<>();
             for (RulesDTO ruleDTO : rulesDTOList) {
                 currentPos = 0;
                 Expression expression = getExpressionFromRule(session, ruleDTO.getId());
                 String resultFact = ruleDTO.getResult_fact();
-
-    //PRINT
-              //  System.out.println("e " + expression);
+//PRINT
+                  System.out.println("e " + expression);
                 rulesList.add(new Rule(expression, resultFact));
             }
             return new Model(rulesList, knownFacts);
@@ -68,45 +54,45 @@ public class ParserDB implements Parser {
 
     private Expression getExpressionFromRule(SqlSession session, int ruleId) {
         ExpressionDTOMapper ruleMapper = session.getMapper(ExpressionDTOMapper.class);
-        List<ExpressionDTO> ruleList = ruleMapper.getExpressionByRuleID(ruleId);
+        List<HashMap<String, Object>> a = ruleMapper.getExpressionByRuleID(ruleId);
 
-        for (; currentPos < ruleList.size(); ) {
-            Integer type = ruleList.get(currentPos).getType();
-            String fact = ruleList.get(currentPos).getFact();
+        for (; currentPos < a.size(); ) {
+            String type = (String) a.get(currentPos).get("type_expression");
+            String fact = (String) a.get(currentPos).get("fact");
             currentPos++;
 
-            if (type == indexOfFactType) {
+            if (type.equals("fact")) {
                 return new FactExpression(fact);
             }
-            if (type == indexOfAndType) {
-                return new AndExpression(getExpressionFromRule(ruleList, 1));
+            if (type.equals("and")) {
+                return new AndExpression(getExpressionFromRule(a, 1));
             }
-            if (type == indexOfOrType) {
-                return new OrExpression(getExpressionFromRule(ruleList, 1));
+            if (type.equals("or")) {
+                return new OrExpression(getExpressionFromRule(a, 1));
             }
         }
         return null;
     }
 
 
-    private Collection<Expression> getExpressionFromRule(List<ExpressionDTO> ruleList, int previousNode_) {
+    private Collection<Expression> getExpressionFromRule(List<HashMap<String, Object>> ruleList, int previousNode_) {
         ArrayList<Expression> currentLine = new ArrayList<>();
 
         for (; currentPos < ruleList.size(); ) {
-            Integer type = ruleList.get(currentPos).getType();
-            String fact = ruleList.get(currentPos).getFact();
-            Integer parentId = ruleList.get(currentPos).getParent_id();
-            int elementNum = ruleList.get(currentPos).getElement_num();
+            String type = (String) ruleList.get(currentPos).get("type_expression");
+            String fact = (String) ruleList.get(currentPos).get("fact");
+            Integer parentId = (Integer) ruleList.get(currentPos).get("parent_id");
+            int elementNum = (int) ruleList.get(currentPos).get("element_num");
 
             if (parentId != previousNode_)
                 return currentLine;
 
             currentPos++;
-            if (type == indexOfFactType)
+            if (type.equals("fact"))
                 currentLine.add(new FactExpression(fact));
-            if (type == indexOfAndType)
+            if (type.equals("and"))
                 currentLine.add(new AndExpression(getExpressionFromRule(ruleList, elementNum)));
-            if (type == indexOfOrType)
+            if (type.equals("or"))
                 currentLine.add(new OrExpression(getExpressionFromRule(ruleList, elementNum)));
         }
         return currentLine;

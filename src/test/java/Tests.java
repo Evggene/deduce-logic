@@ -9,7 +9,7 @@ import java.io.*;
 public class Tests extends Assert {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
+    private final PrintStream originalOut = System.err;
 
     @Before
     public void setUpStreams() {

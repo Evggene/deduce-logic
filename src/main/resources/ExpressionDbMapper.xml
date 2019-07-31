@@ -6,9 +6,18 @@
         INSERT INTO expression (ref_rules, element_num, parent_id, fact, type) VALUES(#{ref_rules}, #{element_num}, #{parent_id}, #{fact}, #{type})
     </insert>
 
-    <select id="getExpressionByRuleID" parameterType="int" resultType="deduction.dto.domains.ExpressionDTO">
-        SELECT element_num, parent_id, fact, type FROM expression where ref_rules = #{ref_rules}
+    <select id="getExpressionByRuleID" parameterType="int" resultMap="res">
+        select element_num, parent_id, fact, type_expression from expression join type_of_expression
+        on expression.type = type_of_expression.id where ref_rules=#{ref_rules}
     </select>
+
+    <resultMap id="res" type="java.util.HashMap">
+        <id property="id" column="id" />
+        <result property="element_num" column="element_num" />
+        <result property="parent_id" column="parent_id" />
+        <result property="fact" column="fact" />
+        <result property="type_expression" column="type_expression" />
+    </resultMap>
 
     <delete id="deleteExpression" parameterType="int">
         DELETE FROM expression WHERE ref_rules=#{ref_rules}

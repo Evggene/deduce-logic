@@ -27,17 +27,16 @@ public class Engine {
         TXT, XML, DB
     }
 
-
     private SqlSessionFactory ssf;
 
-
-     public void createSqlSessionFactory(String filename) {
-         try {
-             ssf = new SqlSessionFactoryBuilder().build(new FileReader(filename));
-         } catch (FileNotFoundException e) {
-             System.out.println(e.getMessage());
-         }
-     }
+    public void createSqlSessionFactory(String filename) {
+        try {
+            ssf = new SqlSessionFactoryBuilder().build(new FileReader(filename));
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+    }
 
     public void deduce(String file, FormatEnum fmt) {
         Model model;
@@ -48,16 +47,18 @@ public class Engine {
             model = parser.parse(file);
             resultsList = model.deduce();
         } catch (FileNotFoundException e) {
-            System.err.print("Wrong argument: file not found");
+            System.out.print("Wrong argument: file not found");
             return;
         } catch (IOException e) {
-            System.err.print("Error when reading file: " + e.getMessage());
+            System.out.print("Error when reading file: " + e.getMessage());
             return;
         } catch (ParserException e) {
-            System.err.print(e.getMessage());
+            System.out.print(e.getMessage());
+            e.getStackTrace();
             return;
         } catch (Exception e) {
-            System.err.print("Error: " + e.getMessage());
+            //System.out.print("Error: " + e.getCause() + " dfh");
+            e.printStackTrace();
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -100,13 +101,14 @@ public class Engine {
                 writer.convert(outputFile, model);
                 System.out.print("Conversion is done");
             } catch (IOException e) {
-                System.err.print("Invalid argument: " + e.getMessage());
+                System.out.print("Invalid argument: " + e.getMessage());
             } catch (SAXException e) {
-                System.err.print("Invalid file syntax: " + e.getMessage());
+                System.out.print("Invalid file syntax: " + e.getMessage());
             } catch (JAXBException e) {
-                System.err.print("Invalid file syntax: " + e.getMessage());
+                System.out.print("Invalid file syntax: " + e.getMessage());
             } catch (Exception e) {
-                System.err.print(e.getCause().getMessage().substring(0, e.getCause().getMessage().indexOf("\n")));
+                System.out.print(e.getCause().getMessage().substring(0, e.getCause().getMessage().indexOf("\n")));
+                e.getStackTrace();
             }
     }
 
@@ -131,9 +133,7 @@ public class Engine {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }
 
 
