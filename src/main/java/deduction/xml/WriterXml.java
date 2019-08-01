@@ -7,8 +7,10 @@ import deduction.Writer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
 public class WriterXml implements Writer {
@@ -17,6 +19,6 @@ public class WriterXml implements Writer {
         JAXBContext context = JAXBContext.newInstance(Model.class);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.marshal(model, new FileWriter(filename));
+        m.marshal(model, new File(filename));
     }
 }

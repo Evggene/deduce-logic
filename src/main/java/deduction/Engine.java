@@ -29,7 +29,7 @@ public class Engine {
 
     private SqlSessionFactory ssf;
 
-    public void createSqlSessionFactory(String filename) {
+    public void setDBConfig(String filename) {
         try {
             ssf = new SqlSessionFactoryBuilder().build(new FileReader(filename));
         } catch (FileNotFoundException e) {
@@ -39,6 +39,7 @@ public class Engine {
     }
 
     public void deduce(String file, FormatEnum fmt) {
+
         Model model;
         Parser parser;
         Collection<String> resultsList;
@@ -54,11 +55,11 @@ public class Engine {
             return;
         } catch (ParserException e) {
             System.out.print(e.getMessage());
-            e.getStackTrace();
+            // e.printStackTrace();
             return;
         } catch (Exception e) {
-            //System.out.print("Error: " + e.getCause() + " dfh");
-            e.printStackTrace();
+            System.out.print("Error: " + e.getCause());
+             e.printStackTrace();
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -69,6 +70,12 @@ public class Engine {
             sb.append(", ").append(i.next());
         }
         System.out.print(sb);
+    }
+
+
+    public void deduce(String file, FormatEnum fmt, String config) {
+
+        return;
     }
 
 
@@ -92,7 +99,9 @@ public class Engine {
 
         if (fmtin == fmtout) {
             System.err.println("Error: format input file and format output file are the same");
-        } else
+            return;
+        }
+
             try {
                 parser = createParser(fmtin);
                 model = parser.parse(inputFile);
@@ -126,7 +135,8 @@ public class Engine {
         }
     }
 
-    public void deleteDB(String inputFile) {
+    public void deleteDB(String inputFile, String config) {
+        setDBConfig(config);
         try {
             WriterDB writer = new WriterDB(ssf);
             writer.deleteModelDB(inputFile);

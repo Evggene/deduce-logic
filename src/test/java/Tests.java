@@ -248,33 +248,34 @@ public class Tests extends Assert {
     }
 
 
-    @Test
-    public void test229() throws IOException {                           // проверка конвертации txt в xml
+//    @Test
+//    public void test229() throws IOException {                           // проверка конвертации txt в xml
+//
+//        File input = new File(getClass().getResource("first.txt").getFile());
+//        File output = new File("checkfirstxmlc.xml");
+//        File check = new File(getClass().getResource("logic.xml").getFile());
+//        Main.main(new String[]{"convert", "-txtin", input.getAbsolutePath(), "-xmlout", output.getAbsolutePath()});
+//
+//        assertEquals("Conversion is done", outContent.toString());
+//        assertEquals("The files differ!",
+//                FileUtils.readFileToString(output, "utf-8"),
+//                FileUtils.readFileToString(check, "utf-8"));
+//    }
 
-        File input = new File(getClass().getResource("first.txt").getFile());
-        File output = new File("checkfirstxmlc.xml");
-        File check = new File(getClass().getResource("logic.xml").getFile());
-        Main.main(new String[]{"convert", "-txtin", input.getAbsolutePath(), "-xmlout", output.getAbsolutePath()});
 
-        assertEquals("Conversion is done", outContent.toString());
-        assertEquals("The files differ!",
-                FileUtils.readFileToString(output, "utf-8"),
-                FileUtils.readFileToString(check, "utf-8"));
-    }
-
-
-    @Test
-    public void test2299() throws IOException {                           // проверка конвертации txt в db и обратно в txt
-
-        File output = new File("dbcheck.txt");
-        File check = new File(getClass().getResource("checkxmllogic2.txt").getFile());
-        Main.main(new String[]{"convert", "-dbin", "checkLogic", "D:\\config.xml", "-txtout", output.getAbsolutePath()});
-
-        //assertEquals("Conversion is done", outContent.toString());
-        assertEquals("The files differ!",
-                FileUtils.readFileToString(output, "utf-8"),
-                FileUtils.readFileToString(check, "utf-8"));
-    }
+//    @Test
+//    public void test2299() throws IOException {                           // проверка конвертации txt в db и обратно в txt
+//                                                                        // в бд необходима модель checkLogic
+//
+//        File output = new File("dbcheck.txt");
+//        File check = new File(getClass().getResource("checkxmllogic2.txt").getFile());
+//        Main.main(new String[]{"convert", "-dbin", "checkLogic", "D:\\config.xml", "-txtout", output.getAbsolutePath()});
+//
+//        //assertEquals("Conversion is done", outContent.toString());
+//        assertEquals("The files differ!",
+//                FileUtils.readFileToString(output, "utf-8"),
+//                FileUtils.readFileToString(check, "utf-8"));
+//    }
 
 
 

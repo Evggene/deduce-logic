@@ -1,21 +1,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.dto.KnownFactsDTOMapper">
+<mapper namespace="deduction.db.mappers.KnownFactsMapper">
 
-    <insert id="insertKnownFacts" parameterType="deduction.dto.domains.KnownFactsDTO">
-        INSERT INTO knownfacts (ref_model, fact) VALUES(#{ref_model}, #{fact})
+    <insert id="insertKnownFacts" parameterType="deduction.db.dto.KnownFactsDTO">
+        INSERT INTO knownfacts (model_id, fact) VALUES(#{model_id}, #{fact})
     </insert>
 
-    <!--<select id="getKnownFactsByModelId" parameterType="int" resultType="java.lang.String">-->
-         <!--SELECT fact FROM knownfacts where ref_model = #{ref_model}-->
-    <select id="getKnownFactsByModelName" parameterType="java.lang.String" resultType="java.lang.String">
-        select fact from knownfacts where ref_model = (select id from model where name = #{name});
+    <select id="getKnownFacts" parameterType="java.lang.String" resultType="java.lang.String">
+        select fact from knownfacts join model on knownfacts.model_id = model.id where model.name = #{name};
     </select>
 
     <delete id="deleteKnownFacts" parameterType="java.lang.String">
-        DELETE FROM knownfacts WHERE ref_model= (select id from model where name = #{name});
+        DELETE FROM knownfacts using model where knownfacts.model_id = model.id and model.name = #{name};
     </delete>
 
 </mapper>
-
 

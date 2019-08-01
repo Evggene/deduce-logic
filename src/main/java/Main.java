@@ -17,19 +17,44 @@ public class Main {
             System.out.println("Empty arguments");
             return;
         }
-        Options options = new Options();
-        Option dbin = Option.builder("dbin").hasArg().numberOfArgs(2).build();
-        Option dbout = Option.builder("dbout").hasArg().numberOfArgs(2).build();
-        options
-                .addOption("txtin", true, "input file in txt format")
-                .addOption("txtout", true, "output file in txt format")
-                .addOption("xmlin", true, "input file in xml format")
-                .addOption("xmlout", true, "output file in xml format")
+
+        Option dbin = Option.builder("dbin").hasArg().numberOfArgs(2).desc("model name and config file name for writing from DB").build();
+        Option txtin = Option.builder("txtin").hasArg().numberOfArgs(1).argName("file name").desc("input file in txt format").build();
+        Option xmlin = Option.builder("xmlin").hasArg().numberOfArgs(1).argName("file name").desc("input file in xml format").build();
+
+        Option txtout = Option.builder("txtout").hasArg().numberOfArgs(1).argName("file name").desc("output file in txt format").build();
+        Option xmlout = Option.builder("xmlout").hasArg().numberOfArgs(1).argName("file name").desc("output file in txt format").build();
+        Option dbout = Option.builder("dbout").hasArg().numberOfArgs(2).desc("model name and config file name for reading from DB").build();
+
+        OptionGroup optionGroupIn = new OptionGroup();
+        optionGroupIn
+                .addOption(txtin)
+                .addOption(xmlin)
                 .addOption(dbin)
+                .setRequired(true);
+        OptionGroup optionGroupOut = new OptionGroup();
+        optionGroupOut
+                .addOption(txtout)
+                .addOption(xmlout)
                 .addOption(dbout);
+        Options options = new Options();
+        options
+                .addOptionGroup(optionGroupIn)
+                .addOptionGroup(optionGroupOut);
+
+        HelpFormatter formatter = new HelpFormatter();
 
         CommandLine line;
         try {
+            if (args[0].equals("-help")) {
+                formatter.printHelp("help",
+                        "Required one command of the following: " + System.lineSeparator() +
+                                "'deduce' (accepts one of '-...in' optiona) : computes a set of passed rules " +
+                                "'convert' (accepts one of '-...in' and '...out' optiona) : converts file from input to output format " + System.lineSeparator() +
+                                "'delete' (accepts '-dbin' option) : removes a model from the database ",
+                        options, "");
+                return;
+            }
             line = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
@@ -42,37 +67,51 @@ public class Main {
                     System.out.println("Wrong number of arguments");
                     return;
                 }
-                String inputFile;
+                if (line.getArgs().length != 1) {
+                    System.out.println("Wrong number of arguments");
+                    return;
+                }
+                String inputFile = null;
+                Engine.FormatEnum formatInputFile = null;
                 Engine engine = new Engine();
+                String dbArgs[] = null;
 
                 if (line.hasOption("txtin")) {
                     inputFile = line.getOptionValue("txtin");
-                    engine.deduce(inputFile, Engine.FormatEnum.TXT);
-                    return;
+                    formatInputFile = Engine.FormatEnum.TXT;
                 }
                 if (line.hasOption("xmlin")) {
                     inputFile = line.getOptionValue("xmlin");
-                    engine.deduce(inputFile, Engine.FormatEnum.XML);
-                    return;
+                    formatInputFile = Engine.FormatEnum.XML;
                 }
                 if (line.hasOption("dbin")) {
-                    String s[] = line.getOptionValues("dbin");
-                    engine.createSqlSessionFactory(s[1]);
-                    engine.deduce(s[0], Engine.FormatEnum.DB);
-                    return;
+                    dbArgs = line.getOptionValues("dbin");
+                    inputFile = dbArgs[0];
+                    formatInputFile = Engine.FormatEnum.DB;
+                    engine.setDBConfig(dbArgs[1]);
                 }
-                System.out.println("Unknown key. Required: '-txtin', '-xmlin', '-dbin'");
+                engine.deduce(inputFile, formatInputFile);
                 return;
 
 
             case "convert":
                 if (line.getOptions().length != 2) {
-                    System.out.println("Wrong number of arguments");
+                    System.out.println("Wrong number of options: redundant " + line.getOptions()[2].getOpt() + " with value " + line.getOptions()[2].getValue());
                     return;
                 }
+                if (line.getArgs().length != 1) {
+                    System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
+                    return;
+                }
+//                if (!line.hasOption("txtout") && !line.hasOption("xmlout") && !line.hasOption("dbout")) {
+//                    System.out.println("Missing required options: '-txtout', '-xmlout', '-dbout'");
+//                    return;
+//                }
+
                 inputFile = null;
-                String outputFile;
-                Engine.FormatEnum formatInputFile = null;
+                String outputFile = null;
+                formatInputFile = null;
+                Engine.FormatEnum formatOutputFile = null;
                 engine = new Engine();
 
                 if (line.hasOption("txtin")) {
@@ -84,42 +123,44 @@ public class Main {
                     formatInputFile = Engine.FormatEnum.XML;
                 }
                 if (line.hasOption("dbin")) {
-                    String s[] = line.getOptionValues("dbin");
-                    engine.createSqlSessionFactory(s[1]);
-                    inputFile = s[0];
+                    dbArgs = line.getOptionValues("dbin");
+                    engine.setDBConfig(dbArgs[1]);
+                    inputFile = dbArgs[0];
                     formatInputFile = Engine.FormatEnum.DB;
                 }
                 if (line.hasOption("txtout")) {
                     outputFile = line.getOptionValue("txtout");
-                    engine.convert(inputFile, formatInputFile, outputFile, Engine.FormatEnum.TXT);
-                    return;
+                    formatOutputFile = Engine.FormatEnum.TXT;
                 }
                 if (line.hasOption("xmlout")) {
                     outputFile = line.getOptionValue("xmlout");
-                    engine.convert(inputFile, formatInputFile, outputFile, Engine.FormatEnum.XML);
-                    return;
+                    formatOutputFile = Engine.FormatEnum.XML;
                 }
                 if (line.hasOption("dbout")) {
-                    String s[] = line.getOptionValues("dbout");
-                    engine.createSqlSessionFactory(s[1]);
-                    engine.convert(inputFile, formatInputFile, s[0], Engine.FormatEnum.DB);
-                    return;
+                    dbArgs = line.getOptionValues("dbout");
+                    outputFile = dbArgs[0];
+                    formatOutputFile = Engine.FormatEnum.DB;
+                    engine.setDBConfig(dbArgs[1]);
                 }
-                System.out.println("Unknown key");
+                engine.convert(inputFile, formatInputFile, outputFile, formatOutputFile);
                 return;
 
 
             case "delete":
                 if (line.getOptions().length != 1) {
-                    System.out.println("Wrong number of arguments");
+                    System.out.println("Wrong number of arguments ");
+                    return;
+                }
+                if (line.getArgs().length != 1) {
+                    System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
                     return;
                 }
                 engine = new Engine();
 
                 if (line.hasOption("dbin")) {
-                    String s[] = line.getOptionValues("dbin");
-                    engine.createSqlSessionFactory(s[1]);
-                    engine.deleteDB(s[0]);
+                    dbArgs = line.getOptionValues("dbin");
+                    engine.setDBConfig(dbArgs[1]);
+                    engine.deleteDB(dbArgs[0], dbArgs[1]);
                     return;
                 }
                 System.out.println("Command 'delete' may have only '-dbin' argument");
@@ -128,7 +169,5 @@ public class Main {
             default:
                 System.out.println("Unknown command. Required: 'deduce', 'convert', 'delete'");
         }
-
     }
 }
-

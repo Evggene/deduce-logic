@@ -1,13 +1,12 @@
-package deduction.dto.domains;
+package deduction.db.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+
 public class TypeOfExpressionDTO {
-    private int id;
-    private String type_expression;
+    public int id;
+    public String type_expression;
 
     public TypeOfExpressionDTO() {
     }

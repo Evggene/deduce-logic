@@ -2,10 +2,12 @@ package deduction.db;
 
 
 import deduction.Parser;
-import deduction.dto.*;
-import deduction.dto.domains.ExpressionDTO;
-import deduction.dto.domains.RulesDTO;
-import deduction.dto.domains.TypeOfExpressionDTO;
+import deduction.ParserException;
+import deduction.db.dto.ExpressionsDTO;
+import deduction.db.dto.RulesDTO;
+import deduction.db.mappers.ExpressionsMapper;
+import deduction.db.mappers.KnownFactsMapper;
+import deduction.db.mappers.RulesMapper;
 import deduction.model.Model;
 import deduction.model.Rule;
 import deduction.model.expression.AndExpression;
@@ -28,24 +30,30 @@ public class ParserDB implements Parser {
     }
 
     @Override
-    public Model parse(String modelName) {
+    public Model parse(String modelName) throws ParserException {
 
         try (SqlSession session = ssf.openSession()) {
 
-            KnownFactsDTOMapper factsMapper = session.getMapper(KnownFactsDTOMapper.class);
-            Set<String> knownFacts = factsMapper.getKnownFactsByModelName(modelName);
+            KnownFactsMapper factsMapper = session.getMapper(KnownFactsMapper.class);
+            Set<String> knownFacts = factsMapper.getKnownFacts(modelName);
 
-            RulesDTOMapper rulesMapper = session.getMapper(RulesDTOMapper.class);
-            List<RulesDTO> rulesDTOList = rulesMapper.getRulesByModelName(modelName);
+            if (knownFacts.isEmpty()) {
+                throw new ParserException(0, "Empty known facts");
+            }
+            RulesMapper rulesMapper = session.getMapper(RulesMapper.class);
+            List<RulesDTO> rulesDTOList = rulesMapper.getRules(modelName);
+
+            if (rulesDTOList.isEmpty()) {
+                throw new ParserException(0, "Emty rules");
+            }
 
             Collection<Rule> rulesList = new ArrayList<>();
             for (RulesDTO ruleDTO : rulesDTOList) {
                 currentPos = 0;
-                Expression expression = getExpressionFromRule(session, ruleDTO.getId());
-                String resultFact = ruleDTO.getResult_fact();
+                Expression expression = getExpressionFromRule(session, ruleDTO.id);
 //PRINT
-                  System.out.println("e " + expression);
-                rulesList.add(new Rule(expression, resultFact));
+                //        System.out.println("e " + expression);
+                rulesList.add(new Rule(expression, ruleDTO.result_fact));
             }
             return new Model(rulesList, knownFacts);
         }
@@ -53,12 +61,12 @@ public class ParserDB implements Parser {
 
 
     private Expression getExpressionFromRule(SqlSession session, int ruleId) {
-        ExpressionDTOMapper ruleMapper = session.getMapper(ExpressionDTOMapper.class);
-        List<HashMap<String, Object>> a = ruleMapper.getExpressionByRuleID(ruleId);
+        ExpressionsMapper ruleMapper = session.getMapper(ExpressionsMapper.class);
+        List<ExpressionsDTO> a = ruleMapper.getExpression(ruleId);
 
         for (; currentPos < a.size(); ) {
-            String type = (String) a.get(currentPos).get("type_expression");
-            String fact = (String) a.get(currentPos).get("fact");
+            String type = a.get(currentPos).type_expression;
+            String fact = a.get(currentPos).fact;
             currentPos++;
 
             if (type.equals("fact")) {
@@ -75,17 +83,17 @@ public class ParserDB implements Parser {
     }
 
 
-    private Collection<Expression> getExpressionFromRule(List<HashMap<String, Object>> ruleList, int previousNode_) {
+    private Collection<Expression> getExpressionFromRule(List<ExpressionsDTO> ruleList, int previousNode_) {
         ArrayList<Expression> currentLine = new ArrayList<>();
 
         for (; currentPos < ruleList.size(); ) {
-            String type = (String) ruleList.get(currentPos).get("type_expression");
-            String fact = (String) ruleList.get(currentPos).get("fact");
-            Integer parentId = (Integer) ruleList.get(currentPos).get("parent_id");
-            int elementNum = (int) ruleList.get(currentPos).get("element_num");
+            String type = ruleList.get(currentPos).type_expression;
+            String fact = ruleList.get(currentPos).fact;
+            Integer parentId = ruleList.get(currentPos).parent_id;
+            int elementNum = ruleList.get(currentPos).element_num;
 
-            if (parentId != previousNode_)
-                return currentLine;
+            if (parentId != previousNode_){
+                return currentLine;}
 
             currentPos++;
             if (type.equals("fact"))

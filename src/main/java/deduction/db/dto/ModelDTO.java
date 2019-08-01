@@ -1,14 +1,14 @@
-package deduction.dto.domains;
+package deduction.db.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+
+
 public class ModelDTO {
 
-    private int id;
-    private String name;
+    public int id;
+    public String name;
 
     public ModelDTO() {
     }

@@ -2,18 +2,20 @@ package deduction.db;
 
 
 import deduction.Writer;
-import deduction.dto.*;
-import deduction.dto.domains.KnownFactsDTO;
-import deduction.dto.domains.ExpressionDTO;
-import deduction.dto.domains.RulesDTO;
-import deduction.dto.domains.TypeOfExpressionDTO;
+import deduction.db.dto.ExpressionsDTO;
+import deduction.db.dto.KnownFactsDTO;
+import deduction.db.dto.RulesDTO;
+
+import deduction.db.mappers.ExpressionsMapper;
+import deduction.db.mappers.KnownFactsMapper;
+import deduction.db.mappers.ModelMapper;
+import deduction.db.mappers.RulesMapper;
 import deduction.model.Model;
 import deduction.model.Rule;
 import deduction.model.expression.Expression;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +23,7 @@ import java.util.List;
 public class WriterDB implements Writer {
 
     private SqlSessionFactory ssf;
-    private int indexOfFactType = 0, indexOfOrType = 0, indexOfAndType = 0, elementNumber = 0;
+    private int elementNumber;
 
     public WriterDB(SqlSessionFactory ssf) {
         this.ssf = ssf;
@@ -32,31 +34,19 @@ public class WriterDB implements Writer {
 
         try (SqlSession session = ssf.openSession()) {
 
-            ModelDTOMapper modelMapper = session.getMapper(ModelDTOMapper.class);
+            ModelMapper modelMapper = session.getMapper(ModelMapper.class);
             modelMapper.insertNameInModel(modelName);
             session.commit();
 
-            int modelId = modelMapper.getModelIdByName(modelName);
+            int modelId = modelMapper.getModelId(modelName);
 
-            KnownFactsDTOMapper knownFactsMapper = session.getMapper(KnownFactsDTOMapper.class);
+            KnownFactsMapper knownFactsMapper = session.getMapper(KnownFactsMapper.class);
             for (String fact : model.getKnownFactsList()) {
                 knownFactsMapper.insertKnownFacts(new KnownFactsDTO(modelId, fact));
                 session.commit();
             }
 
-            TypeOfExpressionDTOMapper toe = session.getMapper(TypeOfExpressionDTOMapper.class);
-            List<TypeOfExpressionDTO> typeOfExpression = toe.getIdByType();
-
-            for (TypeOfExpressionDTO typeOfExpressionDTO : typeOfExpression) {
-                if (typeOfExpressionDTO.getType_expression().equals("fact"))
-                    indexOfFactType = typeOfExpressionDTO.getId();
-                if (typeOfExpressionDTO.getType_expression().equals("or"))
-                    indexOfOrType = typeOfExpressionDTO.getId();
-                if (typeOfExpressionDTO.getType_expression().equals("and"))
-                    indexOfAndType = typeOfExpressionDTO.getId();
-            }
-
-            RulesDTOMapper rulesDBMapper = session.getMapper(RulesDTOMapper.class);
+            RulesMapper rulesDBMapper = session.getMapper(RulesMapper.class);
             for (Rule rule : model.getRulesList()) {
 
                 RulesDTO rulesDTO = new RulesDTO(rule.getResultFact(), modelId);
@@ -64,17 +54,15 @@ public class WriterDB implements Writer {
                 session.commit();
 
                 Expression expression = rule.getExpression();
-
                 if (rule.getExpression().getStringPresentation().equals("Fact")) {
-                    ExpressionDTOMapper expressionMapper = session.getMapper(ExpressionDTOMapper.class);
-                    //PRINT
+                    ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+//PRINT
                     //   System.out.println(expression.toString());
-                    expressionMapper.insertElement(new ExpressionDTO(rulesDTO.getId(), 1, null, expression.toString(), indexOfFactType));
+                    expressionMapper.insertElement(new ExpressionsDTO(rulesDTO.id, 1, null, expression.toString(), "fact"));
                     session.commit();
-                }
-                else {
+                } else {
                     elementNumber = 0;
-                    serializeExpression(session, expression, rulesDTO.getId(), null);
+                    serializeExpression(session, expression, rulesDTO.id, null);
                 }
             }
         }
@@ -82,22 +70,21 @@ public class WriterDB implements Writer {
 
 
     private void serializeExpression(SqlSession session, Expression ex, int id_, Integer parentId_) {
-        ExpressionDTOMapper ruleDBMapper = session.getMapper(ExpressionDTOMapper.class);
+        ExpressionsMapper ruleDBMapper = session.getMapper(ExpressionsMapper.class);
         Integer parentId = parentId_;
 
         if (ex.getStringPresentation().equals("Fact")) {
-            ruleDBMapper.insertElement(new ExpressionDTO(id_, ++elementNumber, parentId, ex.toString(), indexOfFactType));
+            ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, ex.toString(), "fact"));
             session.commit();
         }
         if (ex.getStringPresentation().equals("Or")) {
-            ruleDBMapper.insertElement(new ExpressionDTO(id_, ++elementNumber, parentId, null, indexOfOrType));
+            ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, null, "or"));
             session.commit();
         }
-        if (ex.getStringPresentation().equals("And"))  {
-            ruleDBMapper.insertElement(new ExpressionDTO(id_, ++elementNumber, parentId, null, indexOfAndType));
+        if (ex.getStringPresentation().equals("And")) {
+            ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, null, "and"));
             session.commit();
         }
-        session.commit();
 
         parentId = elementNumber;
         for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
@@ -106,7 +93,7 @@ public class WriterDB implements Writer {
                 serializeExpression(session, expression, id_, parentId);
                 continue;
             } else {
-                ruleDBMapper.insertElement(new ExpressionDTO(id_, ++elementNumber, parentId, expression.toString(), indexOfFactType));
+                ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, expression.toString(), "fact"));
                 session.commit();
             }
             if (!iterator.hasNext()) {
@@ -116,29 +103,27 @@ public class WriterDB implements Writer {
     }
 
 
-
-
     public void deleteModelDB(String modelName) {
         try (SqlSession session = ssf.openSession()) {
 
-            RulesDTOMapper rulesMapper = session.getMapper(RulesDTOMapper.class);
-            List<RulesDTO> rulesDTOList = rulesMapper.getRulesByModelName(modelName);
+            RulesMapper rulesMapper = session.getMapper(RulesMapper.class);
+            List<RulesDTO> rulesDTOList = rulesMapper.getRules(modelName);
 
-            ExpressionDTOMapper expressionDTOMapper = session.getMapper(ExpressionDTOMapper.class);
+            ExpressionsMapper expressionDTOMapper = session.getMapper(ExpressionsMapper.class);
             for (RulesDTO ruleDB : rulesDTOList) {
 
-                expressionDTOMapper.deleteExpression(ruleDB.getId());
+                expressionDTOMapper.deleteExpression(ruleDB.id);
                 session.commit();
             }
             for (RulesDTO ruleDB : rulesDTOList) {
-                rulesMapper.deleteRules(ruleDB.getId());
+                rulesMapper.deleteRules(ruleDB.id);
                 session.commit();
             }
-            KnownFactsDTOMapper factsMapper = session.getMapper(KnownFactsDTOMapper.class);
+            KnownFactsMapper factsMapper = session.getMapper(KnownFactsMapper.class);
             factsMapper.deleteKnownFacts(modelName);
             session.commit();
 
-            ModelDTOMapper modelMapper = session.getMapper(ModelDTOMapper.class);
+            ModelMapper modelMapper = session.getMapper(ModelMapper.class);
             modelMapper.deleteModel(modelName);
             session.commit();
         }

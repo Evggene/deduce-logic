@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.dto.TypeOfExpressionDTOMapper">
+<mapper namespace="deduction.db.dto.TypeOfExpressionDTOMapper">
 
-    <select id="getIdByType" parameterType="java.lang.String" resultType="deduction.dto.domains.TypeOfExpressionDTO">
+    <select id="getIdByType" parameterType="java.lang.String" resultType="deduction.db.dto.TypeOfExpressionDTO">
         SELECT id, type_expression FROM type_of_expression
     </select>
 
