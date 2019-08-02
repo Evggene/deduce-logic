@@ -2,21 +2,13 @@
 
 <mapper namespace="deduction.db.mappers.ModelMapper">
 
-    <insert id="insertNameInModel" parameterType="java.lang.String">
+    <insert id="insertModel" parameterType="deduction.db.dto.ModelDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
       INSERT INTO model (name) VALUES(#{name})
     </insert>
-
-    <select id="getModelId" parameterType="java.lang.String" resultType="java.lang.Integer">
-        select id from model where name=#{name}
-    </select>
 
     <delete id="deleteModel" parameterType="java.lang.String">
         DELETE FROM model WHERE name=#{name}
     </delete>
-
-    <select id="checkExistModel" parameterType="java.lang.String" resultType="java.lang.Integer">
-        SELECT count(id) FROM model where name = #{name}
-    </select>
 
 
 </mapper>

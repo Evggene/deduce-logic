@@ -2,18 +2,18 @@
 
 <mapper namespace="deduction.db.mappers.ExpressionsMapper">
 
-    <insert id="insertElement" parameterType="deduction.db.dto.ExpressionsDTO" >
-        INSERT INTO expressions (rules_id, element_num, parent_id, fact, type_id)
-            select #{rules_id}, #{element_num}, #{parent_id}, #{fact}, id from type_of_expression where type_expression = #{type_expression}
+    <insert id="insertElement" parameterType="deduction.db.dto.ExpressionsDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO expressions (parent_id, fact, type_id)
+            select #{parent_id}, #{fact}, id from type_of_expression where type_expression = #{type_expression}
     </insert>
-
-    <select id="getExpression" parameterType="int" resultType="deduction.db.dto.ExpressionsDTO">
-        select element_num, parent_id, fact, type_expression from expressions join type_of_expression
-        on expressions.type_id = type_of_expression.id where rules_id=#{rules_id}
-    </select>
 
     <delete id="deleteExpression" parameterType="int">
         DELETE FROM expressions WHERE rules_id=#{rules_id}
     </delete>
+
+    <select id="getParentExpression" parameterType="int" resultType="deduction.db.dto.ExpressionsDTO">
+        select expressions.id, parent_id, fact, type_expression from expressions join type_of_expression
+        on expressions.type_id = type_of_expression.id where expressions.parent_id=#{expression_id} ORDER BY expressions.id
+    </select>
 
 </mapper>

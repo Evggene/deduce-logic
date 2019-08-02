@@ -116,8 +116,8 @@ public class Engine {
             } catch (JAXBException e) {
                 System.out.print("Invalid file syntax: " + e.getMessage());
             } catch (Exception e) {
-                System.out.print(e.getCause().getMessage().substring(0, e.getCause().getMessage().indexOf("\n")));
-                e.getStackTrace();
+//                System.out.print(e.getCause().getMessage().substring(0, e.getCause().getMessage().indexOf("\n")));
+                e.printStackTrace();
             }
     }
 

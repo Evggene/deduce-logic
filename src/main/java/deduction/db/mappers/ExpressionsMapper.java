@@ -9,7 +9,7 @@ public interface ExpressionsMapper {
 
     void insertElement(ExpressionsDTO expressionDTO);
 
-    List<ExpressionsDTO> getExpression(int ref_rules);
-
     void deleteExpression(int id);
+
+    List<ExpressionsDTO> getParentExpression(int expression_id);
 }

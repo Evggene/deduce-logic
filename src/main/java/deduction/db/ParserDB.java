@@ -23,7 +23,7 @@ import java.util.*;
 public class ParserDB implements Parser {
 
     private SqlSessionFactory ssf;
-    private int currentPos;
+
 
     public ParserDB(SqlSessionFactory ssf) {
         this.ssf = ssf;
@@ -40,19 +40,29 @@ public class ParserDB implements Parser {
             if (knownFacts.isEmpty()) {
                 throw new ParserException(0, "Empty known facts");
             }
+
             RulesMapper rulesMapper = session.getMapper(RulesMapper.class);
             List<RulesDTO> rulesDTOList = rulesMapper.getRules(modelName);
 
             if (rulesDTOList.isEmpty()) {
-                throw new ParserException(0, "Emty rules");
+                throw new ParserException(0, "Empty rules");
             }
 
             Collection<Rule> rulesList = new ArrayList<>();
             for (RulesDTO ruleDTO : rulesDTOList) {
-                currentPos = 0;
-                Expression expression = getExpressionFromRule(session, ruleDTO.id);
-//PRINT
-                //        System.out.println("e " + expression);
+                Expression expression = null;
+                String type = ruleDTO.type_expression;
+
+                if (type.equals("fact")) {
+                    expression = new FactExpression(ruleDTO.fact);
+                }
+                if (type.equals("and")) {
+                    expression = new AndExpression(getExpression(session, ruleDTO.id));
+                }
+                if (type.equals("or")) {
+                    expression = new OrExpression(getExpression(session, ruleDTO.id));
+                }
+                System.out.println(expression);
                 rulesList.add(new Rule(expression, ruleDTO.result_fact));
             }
             return new Model(rulesList, knownFacts);
@@ -60,49 +70,22 @@ public class ParserDB implements Parser {
     }
 
 
-    private Expression getExpressionFromRule(SqlSession session, int ruleId) {
-        ExpressionsMapper ruleMapper = session.getMapper(ExpressionsMapper.class);
-        List<ExpressionsDTO> a = ruleMapper.getExpression(ruleId);
+    private Collection<Expression> getExpression(SqlSession session, int expressionId) {
+        ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+        ArrayList<Expression> currentExpression = new ArrayList<>();
 
-        for (; currentPos < a.size(); ) {
-            String type = a.get(currentPos).type_expression;
-            String fact = a.get(currentPos).fact;
-            currentPos++;
+        List<ExpressionsDTO> expressionsList = expressionMapper.getParentExpression(expressionId);
 
-            if (type.equals("fact")) {
-                return new FactExpression(fact);
-            }
-            if (type.equals("and")) {
-                return new AndExpression(getExpressionFromRule(a, 1));
-            }
-            if (type.equals("or")) {
-                return new OrExpression(getExpressionFromRule(a, 1));
-            }
-        }
-        return null;
-    }
+        for (int i = 0; i < expressionsList.size(); i++) {
+            String type = expressionsList.get(i).type_expression;
 
-
-    private Collection<Expression> getExpressionFromRule(List<ExpressionsDTO> ruleList, int previousNode_) {
-        ArrayList<Expression> currentLine = new ArrayList<>();
-
-        for (; currentPos < ruleList.size(); ) {
-            String type = ruleList.get(currentPos).type_expression;
-            String fact = ruleList.get(currentPos).fact;
-            Integer parentId = ruleList.get(currentPos).parent_id;
-            int elementNum = ruleList.get(currentPos).element_num;
-
-            if (parentId != previousNode_){
-                return currentLine;}
-
-            currentPos++;
             if (type.equals("fact"))
-                currentLine.add(new FactExpression(fact));
+                currentExpression.add(new FactExpression(expressionsList.get(i).fact));
             if (type.equals("and"))
-                currentLine.add(new AndExpression(getExpressionFromRule(ruleList, elementNum)));
+                currentExpression.add(new AndExpression(getExpression(session, expressionsList.get(i).id)));
             if (type.equals("or"))
-                currentLine.add(new OrExpression(getExpressionFromRule(ruleList, elementNum)));
+                currentExpression.add(new OrExpression(getExpression(session, expressionsList.get(i).id)));
         }
-        return currentLine;
+        return currentExpression;
     }
 }

@@ -4,6 +4,7 @@ package deduction.db;
 import deduction.Writer;
 import deduction.db.dto.ExpressionsDTO;
 import deduction.db.dto.KnownFactsDTO;
+import deduction.db.dto.ModelDTO;
 import deduction.db.dto.RulesDTO;
 
 import deduction.db.mappers.ExpressionsMapper;
@@ -23,7 +24,7 @@ import java.util.List;
 public class WriterDB implements Writer {
 
     private SqlSessionFactory ssf;
-    private int elementNumber;
+    private int elementId;
 
     public WriterDB(SqlSessionFactory ssf) {
         this.ssf = ssf;
@@ -35,10 +36,11 @@ public class WriterDB implements Writer {
         try (SqlSession session = ssf.openSession()) {
 
             ModelMapper modelMapper = session.getMapper(ModelMapper.class);
-            modelMapper.insertNameInModel(modelName);
+            ModelDTO modelDTO = new ModelDTO(modelName);
+            modelMapper.insertModel(modelDTO);
             session.commit();
 
-            int modelId = modelMapper.getModelId(modelName);
+            int modelId = modelDTO.id;
 
             KnownFactsMapper knownFactsMapper = session.getMapper(KnownFactsMapper.class);
             for (String fact : model.getKnownFactsList()) {
@@ -49,51 +51,59 @@ public class WriterDB implements Writer {
             RulesMapper rulesDBMapper = session.getMapper(RulesMapper.class);
             for (Rule rule : model.getRulesList()) {
 
-                RulesDTO rulesDTO = new RulesDTO(rule.getResultFact(), modelId);
-                rulesDBMapper.insertRulesDB(rulesDTO);
-                session.commit();
-
                 Expression expression = rule.getExpression();
-                if (rule.getExpression().getStringPresentation().equals("Fact")) {
-                    ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
-//PRINT
-                    //   System.out.println(expression.toString());
-                    expressionMapper.insertElement(new ExpressionsDTO(rulesDTO.id, 1, null, expression.toString(), "fact"));
+                ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+                ExpressionsDTO expressionsDTO = null;
+
+                if (expression.getStringPresentation().equals("Fact")) {
+                    expressionsDTO = new ExpressionsDTO(null, expression.toString(), "fact");
+                    expressionMapper.insertElement(expressionsDTO);
                     session.commit();
                 } else {
-                    elementNumber = 0;
-                    serializeExpression(session, expression, rulesDTO.id, null);
+                    if (expression.getStringPresentation().equals("And")) {
+                        expressionsDTO = new ExpressionsDTO(null, null, "and");
+                    }
+                    if (expression.getStringPresentation().equals("Or")) {
+                        expressionsDTO = new ExpressionsDTO(null, null, "or");
+                    }
+                    expressionMapper.insertElement(expressionsDTO);
+                    session.commit();
+                    serializeExpression(session, expression, expressionsDTO.id);
                 }
+                RulesDTO rulesDTO = new RulesDTO(rule.getResultFact(), modelId, expressionsDTO.id);
+                rulesDBMapper.insertRulesDB(rulesDTO);
+                session.commit();
             }
         }
     }
 
 
-    private void serializeExpression(SqlSession session, Expression ex, int id_, Integer parentId_) {
-        ExpressionsMapper ruleDBMapper = session.getMapper(ExpressionsMapper.class);
-        Integer parentId = parentId_;
+    private void serializeExpression(SqlSession session, Expression expression, Integer previousParentId) {
+        ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+        Integer currentParentId;
 
-        if (ex.getStringPresentation().equals("Fact")) {
-            ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, ex.toString(), "fact"));
-            session.commit();
-        }
-        if (ex.getStringPresentation().equals("Or")) {
-            ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, null, "or"));
-            session.commit();
-        }
-        if (ex.getStringPresentation().equals("And")) {
-            ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, null, "and"));
+        if (expression.getStringPresentation().equals("Fact")) {
+            ExpressionsDTO expressionsDTO = new ExpressionsDTO(previousParentId, expression.toString(), "fact");
+            expressionMapper.insertElement(expressionsDTO);
             session.commit();
         }
 
-        parentId = elementNumber;
-        for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
-            Expression expression = iterator.next();
-            if (!(expression.getStringPresentation().equals("Fact"))) {
-                serializeExpression(session, expression, id_, parentId);
-                continue;
+        for (Iterator<Expression> iterator = expression.getExpressions().iterator(); iterator.hasNext(); ) {
+            Expression subExpression = iterator.next();
+            if (!(subExpression.getStringPresentation().equals("Fact"))) {
+                ExpressionsDTO expressionsDTO = null;
+                if (subExpression.getStringPresentation().equals("Or")) {
+                    expressionsDTO = new ExpressionsDTO(previousParentId, null, "or");
+                }
+                if (subExpression.getStringPresentation().equals("And")) {
+                    expressionsDTO = new ExpressionsDTO(previousParentId, null, "and");
+                }
+                expressionMapper.insertElement(expressionsDTO);
+                session.commit();
+                currentParentId = expressionsDTO.id;
+                serializeExpression(session, subExpression, currentParentId);
             } else {
-                ruleDBMapper.insertElement(new ExpressionsDTO(id_, ++elementNumber, parentId, expression.toString(), "fact"));
+                expressionMapper.insertElement(new ExpressionsDTO(previousParentId, subExpression.toString(), "fact"));
                 session.commit();
             }
             if (!iterator.hasNext()) {

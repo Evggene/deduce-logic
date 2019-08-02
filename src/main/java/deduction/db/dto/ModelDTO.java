@@ -12,4 +12,8 @@ public class ModelDTO {
 
     public ModelDTO() {
     }
+
+    public ModelDTO(String name) {
+        this.name = name;
+    }
 }

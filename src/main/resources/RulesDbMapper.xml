@@ -3,11 +3,15 @@
 <mapper namespace="deduction.db.mappers.RulesMapper">
 
     <insert id="insertRulesDB" parameterType="deduction.db.dto.RulesDTO" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
-        INSERT INTO rules (result_fact, model_id) VALUES(#{result_fact}, #{model_id})
+        INSERT INTO rules (result_fact, model_id, expression_id) VALUES(#{result_fact}, #{model_id}, #{expression_id})
     </insert>
 
     <select id="getRules" parameterType="java.lang.String" resultType="deduction.db.dto.RulesDTO">
-        SELECT rules.id, result_fact FROM rules join model on rules.model_id=model.id where model.name = #{name}
+        SELECT  result_fact, expressions.id, parent_id, fact, type_expression
+        FROM rules join model on rules.model_id=model.id
+            join expressions on (expressions.id = rules.expression_id)
+            join type_of_expression on ( type_of_expression.id = type_id)
+        where model.name = #{name}
     </select>
 
     <delete id="deleteRules" parameterType="int">

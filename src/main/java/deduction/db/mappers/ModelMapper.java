@@ -1,10 +1,10 @@
 package deduction.db.mappers;
 
+import deduction.db.dto.ModelDTO;
+
 public interface ModelMapper {
 
-    void insertNameInModel(String name);
-
-    int getModelId(String name);
+    void insertModel(ModelDTO modelDTO);
 
     void deleteModel(String name);
 
