@@ -1,10 +1,15 @@
-package deduction.model.expression;
+package deduction.model;
+
+import deduction.Wrapper;
 
 import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
 public class FactExpression implements Expression {
+
+    private static Collection<Expression> arrayList = new ArrayList<>();
 
     @XmlAttribute()
     private String fact;
@@ -21,14 +26,14 @@ public class FactExpression implements Expression {
         return knownFacts.contains(fact);
     }
 
-    @Override
+
     public Collection<Expression> getExpressions() {
-        return null;
+        return arrayList;
     }
 
     @Override
-    public String getStringPresentation() {
-        return "Fact";
+    public Object accept(Wrapper t) {
+        return t.wrap(this);
     }
 
     @Override

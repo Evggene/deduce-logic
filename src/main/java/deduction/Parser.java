@@ -1,5 +1,6 @@
 package deduction;
 
+
 import deduction.model.Model;
 
 public interface Parser {

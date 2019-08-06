@@ -1,12 +1,8 @@
 
 
 import deduction.Engine;
+import deduction.ConsolePresenter;
 import org.apache.commons.cli.*;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.sql.SQLException;
 
 
 public class Main {
@@ -49,8 +45,8 @@ public class Main {
             if (args[0].equals("-help")) {
                 formatter.printHelp("help",
                         "Required one command of the following: " + System.lineSeparator() +
-                                "'deduce' (accepts one of '-...in' optiona) : computes a set of passed rules " +
-                                "'convert' (accepts one of '-...in' and '...out' optiona) : converts file from input to output format " + System.lineSeparator() +
+                                "'deduce' (accepts one of '-...in' option) : computes a set of passed rules " +
+                                "'write' (accepts one of '-...in' and '...out' options) : converts file from input to output format " + System.lineSeparator() +
                                 "'delete' (accepts '-dbin' option) : removes a model from the database ",
                         options, "");
                 return;
@@ -73,8 +69,8 @@ public class Main {
                 }
                 String inputFile = null;
                 Engine.FormatEnum formatInputFile = null;
-                Engine engine = new Engine();
-                String dbArgs[] = null;
+                Engine engine = new Engine(new ConsolePresenter());
+                String dbArgs[] = new String[2];
 
                 if (line.hasOption("txtin")) {
                     inputFile = line.getOptionValue("txtin");
@@ -88,9 +84,8 @@ public class Main {
                     dbArgs = line.getOptionValues("dbin");
                     inputFile = dbArgs[0];
                     formatInputFile = Engine.FormatEnum.DB;
-                    engine.setDBConfig(dbArgs[1]);
                 }
-                engine.deduce(inputFile, formatInputFile);
+                engine.deduce(formatInputFile, new String[]{inputFile, dbArgs[1]});
                 return;
 
 
@@ -103,16 +98,13 @@ public class Main {
                     System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
                     return;
                 }
-//                if (!line.hasOption("txtout") && !line.hasOption("xmlout") && !line.hasOption("dbout")) {
-//                    System.out.println("Missing required options: '-txtout', '-xmlout', '-dbout'");
-//                    return;
-//                }
 
                 inputFile = null;
                 String outputFile = null;
                 formatInputFile = null;
                 Engine.FormatEnum formatOutputFile = null;
-                engine = new Engine();
+                engine = new Engine(new ConsolePresenter());
+                dbArgs = new String[2];
 
                 if (line.hasOption("txtin")) {
                     inputFile = line.getOptionValue("txtin");
@@ -124,7 +116,6 @@ public class Main {
                 }
                 if (line.hasOption("dbin")) {
                     dbArgs = line.getOptionValues("dbin");
-                    engine.setDBConfig(dbArgs[1]);
                     inputFile = dbArgs[0];
                     formatInputFile = Engine.FormatEnum.DB;
                 }
@@ -140,9 +131,8 @@ public class Main {
                     dbArgs = line.getOptionValues("dbout");
                     outputFile = dbArgs[0];
                     formatOutputFile = Engine.FormatEnum.DB;
-                    engine.setDBConfig(dbArgs[1]);
                 }
-                engine.convert(inputFile, formatInputFile, outputFile, formatOutputFile);
+                engine.convert(inputFile, formatInputFile, new String[]{outputFile, dbArgs[1]}, formatOutputFile);
                 return;
 
 
@@ -155,19 +145,20 @@ public class Main {
                     System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
                     return;
                 }
-                engine = new Engine();
+                engine = new Engine(new ConsolePresenter());
 
                 if (line.hasOption("dbin")) {
                     dbArgs = line.getOptionValues("dbin");
-                    engine.setDBConfig(dbArgs[1]);
-                    engine.deleteDB(dbArgs[0], dbArgs[1]);
+                    engine.deleteDB(dbArgs);
                     return;
                 }
                 System.out.println("Command 'delete' may have only '-dbin' argument");
                 return;
 
             default:
-                System.out.println("Unknown command. Required: 'deduce', 'convert', 'delete'");
+                System.out.println("Unknown command. Required: 'deduce', 'write', 'delete'");
         }
     }
+
+
 }

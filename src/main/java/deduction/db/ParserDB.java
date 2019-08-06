@@ -8,12 +8,7 @@ import deduction.db.dto.RulesDTO;
 import deduction.db.mappers.ExpressionsMapper;
 import deduction.db.mappers.KnownFactsMapper;
 import deduction.db.mappers.RulesMapper;
-import deduction.model.Model;
-import deduction.model.Rule;
-import deduction.model.expression.AndExpression;
-import deduction.model.expression.Expression;
-import deduction.model.expression.FactExpression;
-import deduction.model.expression.OrExpression;
+import deduction.model.*;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 

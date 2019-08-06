@@ -1,11 +1,6 @@
 package deduction.txt;
 
-import deduction.model.Model;
-import deduction.model.Rule;
-import deduction.model.expression.AndExpression;
-import deduction.model.expression.Expression;
-import deduction.model.expression.FactExpression;
-import deduction.model.expression.OrExpression;
+import deduction.model.*;
 import deduction.Parser;
 import deduction.ParserException;
 

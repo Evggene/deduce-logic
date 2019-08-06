@@ -1,9 +1,5 @@
 package deduction.model;
 
-import deduction.model.expression.AndExpression;
-import deduction.model.expression.Expression;
-import deduction.model.expression.FactExpression;
-import deduction.model.expression.OrExpression;
 import lombok.Getter;
 
 import javax.xml.bind.annotation.*;

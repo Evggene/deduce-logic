@@ -1,8 +1,10 @@
 package deduction.txt;
 
+
+
 import deduction.model.Model;
 import deduction.model.Rule;
-import deduction.model.expression.Expression;
+import deduction.model.Expression;
 import deduction.Writer;
 
 import java.io.File;
@@ -13,20 +15,20 @@ import java.util.Iterator;
 public class WriterTxt implements Writer {
 
 
-    public void convert(String filename, Model model) throws IOException {
+    public void write(String filename, Model model) throws IOException {
         try (FileWriter file = new FileWriter(new File(filename))) {
             StringBuilder currentLine = new StringBuilder();
 
-            for (Rule r : model.getRulesList()) {
-                currentLine.append(serializeExpression(r));
-                currentLine.append(" -> ").append(r.getResultFact());
+            for (Rule rule : model.getRules()) {
+                currentLine.append(serializeExpression(rule));
+                currentLine.append(" -> ").append(rule.getResultFact());
                 file.write(currentLine.toString());
                 file.write(System.lineSeparator());
                 currentLine = new StringBuilder();
             }
             file.write(ParserTxt.separator);
 
-            Iterator<String> iterator = model.getKnownFactsList().iterator();
+            Iterator<String> iterator = model.getKnownFacts().iterator();
             if (iterator.hasNext())
                 currentLine.append(iterator.next());
             while (iterator.hasNext()) {
@@ -38,61 +40,50 @@ public class WriterTxt implements Writer {
     }
 
     private String serializeExpression(Rule rule) {
-        StringBuilder sb = new StringBuilder();
-        if (rule.getExpression().getStringPresentation().equals("Fact")) {
-            return rule.getExpression().toString();
+        StringBuilder result = new StringBuilder();
+        Expression ex = rule.getExpression();
+        if (ex.getClass().getSimpleName().equals("FactExpression")) {
+            result.append(ex.toString());
         }
-        String s = serializeExpression(rule.getExpression(), sb);
-    //PRINT
-       // System.out.println(s);
-        return s;
+        if (ex.getClass().getSimpleName().equals("AndExpression")) {
+            result = serializeExpression(ex, result, " && ");
+        }
+        if (ex.getClass().getSimpleName().equals("OrExpression")) {
+            result = serializeExpression(ex, result, " || ");
+        }
+        return result.toString();
     }
 
-    private String serializeExpression(Expression ex, StringBuilder sb) {
+    private StringBuilder serializeExpression(Expression ex, StringBuilder subExpression, String func) {
 
-        if (ex.getStringPresentation().equals("And")) {
-            StringBuilder result = new StringBuilder();
-            for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
-                Expression expression = iterator.next();
-                if (expression.getStringPresentation().equals("Or")) {
-                    result.append("(");
-                    serializeExpression(expression, sb.append(result));
-                    sb.append(")");
-                    result = new StringBuilder();
-                }
-                if (expression.getStringPresentation().equals("And")) {
-                    result.append(serializeExpression(expression, sb.append(result)));
-                    result = new StringBuilder();
-                }
-                if (expression.getStringPresentation().equals("Fact"))
-                    result.append(expression);
-
-                if (!iterator.hasNext()) {
-                    break;
-                }
-                result.append(" && ");
+        for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
+            Expression expression = iterator.next();
+            if (expression.getClass().getSimpleName().equals("OrExpression")) {
+                subExpression.append("(");
+                serializeExpression(expression, subExpression," || ");
+                subExpression.append(")");
             }
-
-            sb.append(result);
-        }
-        if (ex.getStringPresentation().equals("Or")) {
-            StringBuilder result = new StringBuilder();
-            for (Iterator<Expression> iterator = ex.getExpressions().iterator(); iterator.hasNext(); ) {
-                Expression expression = iterator.next();
-                if (!expression.getStringPresentation().equals("Fact")) {
-                    result.append(serializeExpression(expression, sb.append(result)));
-                    result = new StringBuilder();
-                } else {
-                    result.append(expression);
-                }
-                if (!iterator.hasNext()) {
-                    break;
-                }
-                result.append(" || ");
+            if (expression.getClass().getSimpleName().equals("AndExpression")) {
+                subExpression.append(serializeExpression(expression, new StringBuilder(), " && "));
             }
-            sb.append(result);
+            if (expression.getClass().getSimpleName().equals("FactExpression")) {
+                subExpression.append(expression);
+            }
+            if (!iterator.hasNext()) {
+                break;
+            }
+            subExpression.append(func);
         }
-        return sb.toString();
+        return subExpression;
     }
-
 }
+
+
+
+
+
+
+
+
+
+

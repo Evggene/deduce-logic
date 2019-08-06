@@ -1,24 +1,19 @@
 package deduction;
 
 import deduction.db.ParserDB;
-import deduction.txt.ParserTxt;
+
+
 import deduction.model.Model;
+import deduction.txt.ParserTxt;
 import deduction.db.WriterDB;
 import deduction.txt.WriterTxt;
 import deduction.xml.ParserXml;
 import deduction.xml.WriterXml;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Properties;
 
 
 public class Engine {
@@ -28,54 +23,41 @@ public class Engine {
     }
 
     private SqlSessionFactory ssf;
+    private Presenter presenter;
 
-    public void setDBConfig(String filename) {
+    public Engine(Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    private void setDBConfig(String filename) {
         try {
             ssf = new SqlSessionFactoryBuilder().build(new FileReader(filename));
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-            return;
+            presenter.showError("File not found ");
+            presenter.showError(e);
         }
     }
 
-    public void deduce(String file, FormatEnum fmt) {
-
+    public void deduce(FormatEnum fmt, String[] files) {
+        if (fmt == FormatEnum.DB) {
+            setDBConfig(files[1]);
+        }
         Model model;
         Parser parser;
-        Collection<String> resultsList;
+        Collection<String> resultsList = null;
         try {
             parser = createParser(fmt);
-            model = parser.parse(file);
+            model = parser.parse(files[0]);
             resultsList = model.deduce();
-        } catch (FileNotFoundException e) {
-            System.out.print("Wrong argument: file not found");
-            return;
+            presenter.showResult(resultsList);
+        } catch (FileNotFoundException | ParserException e) {
+            presenter.showError("Wrong argument: file not found");
         } catch (IOException e) {
-            System.out.print("Error when reading file: " + e.getMessage());
-            return;
-        } catch (ParserException e) {
-            System.out.print(e.getMessage());
-            // e.printStackTrace();
-            return;
+            presenter.showError("Error when reading file: ");
         } catch (Exception e) {
-            System.out.print("Error: " + e.getCause());
-             e.printStackTrace();
-            return;
+            presenter.showError("Error: ");
         }
-        StringBuilder sb = new StringBuilder();
-        Iterator<String> i = resultsList.iterator();
-        if (i.hasNext())
-            sb.append(i.next());
-        while (i.hasNext()) {
-            sb.append(", ").append(i.next());
-        }
-        System.out.print(sb);
-    }
 
-
-    public void deduce(String file, FormatEnum fmt, String config) {
-
-        return;
     }
 
 
@@ -93,32 +75,28 @@ public class Engine {
     }
 
 
-    public void convert(String inputFile, FormatEnum fmtin, String outputFile, FormatEnum fmtout) {
+    public void convert(String inputFile, FormatEnum fmtin, String[] outputFile, FormatEnum fmtout) {
         Model model;
         Parser parser;
 
         if (fmtin == fmtout) {
-            System.err.println("Error: format input file and format output file are the same");
-            return;
+            new ConsolePresenter().showError("Error: format input file and format output file are the same");
         }
+        if (fmtout == FormatEnum.DB || fmtin == FormatEnum.DB) {
+            setDBConfig(outputFile[1]);
+        }
+        try {
+            parser = createParser(fmtin);
+            model = parser.parse(inputFile);
 
-            try {
-                parser = createParser(fmtin);
-                model = parser.parse(inputFile);
-
-                Writer writer = createWriter(fmtout);
-                writer.convert(outputFile, model);
-                System.out.print("Conversion is done");
-            } catch (IOException e) {
-                System.out.print("Invalid argument: " + e.getMessage());
-            } catch (SAXException e) {
-                System.out.print("Invalid file syntax: " + e.getMessage());
-            } catch (JAXBException e) {
-                System.out.print("Invalid file syntax: " + e.getMessage());
-            } catch (Exception e) {
-//                System.out.print(e.getCause().getMessage().substring(0, e.getCause().getMessage().indexOf("\n")));
-                e.printStackTrace();
-            }
+            Writer writer = createWriter(fmtout);
+            writer.write(outputFile[0], model);
+            presenter.showInfo("Conversion is done");
+        } catch (IOException e) {
+            presenter.showError("Invalid argument: ");
+        } catch (Exception e) {
+            presenter.showError("Invalid file syntax: ");
+        }
     }
 
 
@@ -135,13 +113,13 @@ public class Engine {
         }
     }
 
-    public void deleteDB(String inputFile, String config) {
-        setDBConfig(config);
+    public void deleteDB(String[] files) {
+        setDBConfig(files[1]);
         try {
             WriterDB writer = new WriterDB(ssf);
-            writer.deleteModelDB(inputFile);
+            writer.deleteModelDB(files[0]);
         } catch (Exception e) {
-            e.printStackTrace();
+            presenter.showError(e);
         }
     }
 }

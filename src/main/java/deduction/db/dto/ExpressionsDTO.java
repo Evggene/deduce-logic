@@ -1,11 +1,7 @@
 package deduction.db.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 
-
-
-public class ExpressionsDTO {
+public class ExpressionsDTO implements DTO{
 
     public int id;
     public Integer parent_id;
@@ -27,4 +23,5 @@ public class ExpressionsDTO {
         this.fact = fact;
         this.type_expression = type_expression;
     }
+
 }

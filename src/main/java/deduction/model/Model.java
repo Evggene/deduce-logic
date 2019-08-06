@@ -25,6 +25,16 @@ public class Model {
         this.knownFactsList = knownFactsList;
     }
 
+
+    public Collection<Rule> getRules() {
+        return rulesList;
+    }
+
+
+    public Set<String> getKnownFacts() {
+        return knownFactsList;
+    }
+
     public Collection<String> deduce() {
         int knownFactsSize = 0;
         while (knownFactsSize != knownFactsList.size()) {
@@ -33,14 +43,6 @@ public class Model {
                 aRulesList.calculate(knownFactsList);
             }
         }
-        return knownFactsList;
-    }
-
-    public Collection<Rule> getRulesList() {
-        return rulesList;
-    }
-
-    public Set<String> getKnownFactsList() {
         return knownFactsList;
     }
 }

@@ -1,7 +1,9 @@
 package deduction.xml;
 
+
 import deduction.model.Model;
 import deduction.Parser;
+
 import org.xml.sax.SAXException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,7 +29,7 @@ public class ParserXml implements Parser {
         Unmarshaller um = context.createUnmarshaller();
 
 // PRINT
-    //    for (Rule rule : model.getRulesList()) {
+    //    for (Rule rule : model.getRules()) {
     //        System.out.println(rule.getExpression());
     //    }
         return (Model) um.unmarshal(new StreamSource(filename));
