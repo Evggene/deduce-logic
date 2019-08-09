@@ -1,14 +1,14 @@
 
-
 package deduction.model;
+
 
 import javax.xml.bind.annotation.*;
 import java.util.Collection;
 import java.util.Set;
 
 
-@XmlRootElement(name="deduce")
-public class Model {
+@XmlRootElement(name = "deduce")
+public class Model implements Serializable  {
 
     @XmlElementWrapper(name = "rules")
     @XmlElement(name = "rule")
@@ -25,16 +25,6 @@ public class Model {
         this.knownFactsList = knownFactsList;
     }
 
-
-    public Collection<Rule> getRules() {
-        return rulesList;
-    }
-
-
-    public Set<String> getKnownFacts() {
-        return knownFactsList;
-    }
-
     public Collection<String> deduce() {
         int knownFactsSize = 0;
         while (knownFactsSize != knownFactsList.size()) {
@@ -45,4 +35,15 @@ public class Model {
         }
         return knownFactsList;
     }
+
+    @Override
+    public void serialize(Serializer serializer)  {
+        serializer.serializeModel(rulesList, knownFactsList);
+    }
+    
 }
+
+
+
+
+

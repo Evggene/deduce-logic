@@ -1,6 +1,5 @@
 package deduction.xml;
 
-
 import deduction.model.Model;
 import deduction.Parser;
 
@@ -14,11 +13,10 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
 
-public class ParserXml implements Parser {
+public class XmlParser implements Parser {
 
 
     public Model parse(String filename) throws SAXException, IOException, JAXBException {
-
         Schema schema;
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         File s = new File(getClass().getResource("/scheme.xsd").getFile());
@@ -28,10 +26,6 @@ public class ParserXml implements Parser {
         JAXBContext context = JAXBContext.newInstance(Model.class);
         Unmarshaller um = context.createUnmarshaller();
 
-// PRINT
-    //    for (Rule rule : model.getRules()) {
-    //        System.out.println(rule.getExpression());
-    //    }
         return (Model) um.unmarshal(new StreamSource(filename));
     }
 }

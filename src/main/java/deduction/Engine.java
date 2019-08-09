@@ -1,17 +1,16 @@
 package deduction;
 
-import deduction.db.ParserDB;
+import deduction.db.DbParser;
 
 
 import deduction.model.Model;
-import deduction.txt.ParserTxt;
-import deduction.db.WriterDB;
-import deduction.txt.WriterTxt;
-import deduction.xml.ParserXml;
-import deduction.xml.WriterXml;
+import deduction.txt.TxtParser;
+import deduction.db.DbSerializer;
+import deduction.txt.TxtSerializer;
+import deduction.xml.XmlParser;
+import deduction.xml.XmlSerializer;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-
 import java.io.*;
 import java.util.Collection;
 
@@ -29,6 +28,7 @@ public class Engine {
         this.presenter = presenter;
     }
 
+
     private void setDBConfig(String filename) {
         try {
             ssf = new SqlSessionFactoryBuilder().build(new FileReader(filename));
@@ -44,7 +44,7 @@ public class Engine {
         }
         Model model;
         Parser parser;
-        Collection<String> resultsList = null;
+        Collection<String> resultsList;
         try {
             parser = createParser(fmt);
             model = parser.parse(files[0]);
@@ -57,23 +57,20 @@ public class Engine {
         } catch (Exception e) {
             presenter.showError("Error: ");
         }
-
     }
-
 
     private Parser createParser(FormatEnum fmt) throws Exception {
         switch (fmt) {
             case TXT:
-                return new ParserTxt();
+                return new TxtParser();
             case XML:
-                return new ParserXml();
+                return new XmlParser();
             case DB:
-                return new ParserDB(ssf);
+                return new DbParser(ssf);
             default:
                 throw new Exception("Unknown parser format");
         }
     }
-
 
     public void convert(String inputFile, FormatEnum fmtin, String[] outputFile, FormatEnum fmtout) {
         Model model;
@@ -96,18 +93,18 @@ public class Engine {
             presenter.showError("Invalid argument: ");
         } catch (Exception e) {
             presenter.showError("Invalid file syntax: ");
+            presenter.showError(e);
         }
     }
-
 
     private Writer createWriter(FormatEnum fmt) throws Exception {
         switch (fmt) {
             case TXT:
-                return new WriterTxt();
+                return new TxtSerializer();
             case XML:
-                return new WriterXml();
+                return new XmlSerializer();
             case DB:
-                return new WriterDB(ssf);
+                return new DbSerializer(ssf);
             default:
                 throw new Exception("Unknown parser format");
         }
@@ -116,7 +113,7 @@ public class Engine {
     public void deleteDB(String[] files) {
         setDBConfig(files[1]);
         try {
-            WriterDB writer = new WriterDB(ssf);
+            DbSerializer writer = new DbSerializer(ssf);
             writer.deleteModelDB(files[0]);
         } catch (Exception e) {
             presenter.showError(e);

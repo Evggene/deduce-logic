@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class WriterXml implements Writer {
+public class XmlSerializer implements Writer {
 
      public void write(String filename, Model model) throws JAXBException, IOException {
         JAXBContext context = JAXBContext.newInstance(Model.class);
@@ -22,4 +22,8 @@ public class WriterXml implements Writer {
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         m.marshal(model, new File(filename));
     }
+
+
+
+
 }

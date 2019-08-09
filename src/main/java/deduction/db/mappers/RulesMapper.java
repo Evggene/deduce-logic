@@ -6,11 +6,8 @@ import java.util.List;
 
 
 public interface RulesMapper {
-
-    int insertRulesDB(RulesDTO rulesDTO);
-
+    void insertRulesDB(RulesDTO rulesDTO);
     List<RulesDTO> getRules(String name);
-
     void deleteRules(int ref_model);
 
 }

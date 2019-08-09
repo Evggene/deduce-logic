@@ -46,7 +46,7 @@ public class Main {
                 formatter.printHelp("help",
                         "Required one command of the following: " + System.lineSeparator() +
                                 "'deduce' (accepts one of '-...in' option) : computes a set of passed rules " +
-                                "'write' (accepts one of '-...in' and '...out' options) : converts file from input to output format " + System.lineSeparator() +
+                                "'convert' (accepts one of '-...in' and '...out' options) : converts file from input to output format " + System.lineSeparator() +
                                 "'delete' (accepts '-dbin' option) : removes a model from the database ",
                         options, "");
                 return;
@@ -56,6 +56,13 @@ public class Main {
             System.out.println(e.getMessage());
             return;
         }
+
+        Engine engine = new Engine(new ConsolePresenter());
+        String dbArgs[] = new String[2];
+        String inputFile = null;
+        String outputFile = null;
+        Engine.FormatEnum formatInputFile = null;
+        Engine.FormatEnum formatOutputFile = null;
 
         switch (args[0]) {
             case "deduce":
@@ -67,11 +74,6 @@ public class Main {
                     System.out.println("Wrong number of arguments");
                     return;
                 }
-                String inputFile = null;
-                Engine.FormatEnum formatInputFile = null;
-                Engine engine = new Engine(new ConsolePresenter());
-                String dbArgs[] = new String[2];
-
                 if (line.hasOption("txtin")) {
                     inputFile = line.getOptionValue("txtin");
                     formatInputFile = Engine.FormatEnum.TXT;
@@ -85,6 +87,7 @@ public class Main {
                     inputFile = dbArgs[0];
                     formatInputFile = Engine.FormatEnum.DB;
                 }
+
                 engine.deduce(formatInputFile, new String[]{inputFile, dbArgs[1]});
                 return;
 
@@ -98,14 +101,6 @@ public class Main {
                     System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
                     return;
                 }
-
-                inputFile = null;
-                String outputFile = null;
-                formatInputFile = null;
-                Engine.FormatEnum formatOutputFile = null;
-                engine = new Engine(new ConsolePresenter());
-                dbArgs = new String[2];
-
                 if (line.hasOption("txtin")) {
                     inputFile = line.getOptionValue("txtin");
                     formatInputFile = Engine.FormatEnum.TXT;
@@ -132,6 +127,7 @@ public class Main {
                     outputFile = dbArgs[0];
                     formatOutputFile = Engine.FormatEnum.DB;
                 }
+
                 engine.convert(inputFile, formatInputFile, new String[]{outputFile, dbArgs[1]}, formatOutputFile);
                 return;
 
@@ -154,6 +150,7 @@ public class Main {
                 }
                 System.out.println("Command 'delete' may have only '-dbin' argument");
                 return;
+
 
             default:
                 System.out.println("Unknown command. Required: 'deduce', 'write', 'delete'");

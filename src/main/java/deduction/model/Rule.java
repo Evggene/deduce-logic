@@ -1,22 +1,20 @@
 package deduction.model;
 
-import lombok.Getter;
-
 import javax.xml.bind.annotation.*;
+
 import java.util.Collection;
 
 
-
-public class Rule {
+public class Rule implements Serializable {
 
     @XmlElements({
             @XmlElement(name = "fact", type = FactExpression.class),
             @XmlElement(name = "or", type = OrExpression.class),
             @XmlElement(name = "and", type = AndExpression.class),
     })
-    private @Getter Expression expression;
+    private Expression expression;
     @XmlAttribute()
-    private @Getter String resultFact;
+    private String resultFact;
 
     public Rule() {
     }
@@ -26,10 +24,15 @@ public class Rule {
         this.resultFact = resultFact;
     }
 
-    void calculate(Collection<String> knownFacts) {
+    public void calculate(Collection<String> knownFacts) {
         if (expression.calculate(knownFacts)) {
-                knownFacts.add(resultFact);
-            }
+            knownFacts.add(resultFact);
         }
+    }
+
+    @Override
+    public void serialize(Serializer serializer) {
+        serializer.serializeRule(expression, resultFact);
+    }
 
 }

@@ -1,12 +1,12 @@
 package deduction.db.dto;
 
 
-public class ExpressionsDTO implements DTO{
+public class ExpressionsDTO {
 
     public int id;
-    public Integer parent_id;
+    private Integer parent_id;
     public String fact;
-    public int type_id;
+    private int type_id;
     public String type_expression;
 
     public ExpressionsDTO() {

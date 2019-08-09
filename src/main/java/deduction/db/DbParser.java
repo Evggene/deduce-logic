@@ -1,6 +1,5 @@
 package deduction.db;
 
-
 import deduction.Parser;
 import deduction.ParserException;
 import deduction.db.dto.ExpressionsDTO;
@@ -15,18 +14,17 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import java.util.*;
 
 
-public class ParserDB implements Parser {
+public class DbParser implements Parser {
 
     private SqlSessionFactory ssf;
 
-
-    public ParserDB(SqlSessionFactory ssf) {
+    public DbParser(SqlSessionFactory ssf) {
         this.ssf = ssf;
     }
 
+
     @Override
     public Model parse(String modelName) throws ParserException {
-
         try (SqlSession session = ssf.openSession()) {
 
             KnownFactsMapper factsMapper = session.getMapper(KnownFactsMapper.class);
@@ -35,14 +33,12 @@ public class ParserDB implements Parser {
             if (knownFacts.isEmpty()) {
                 throw new ParserException(0, "Empty known facts");
             }
-
             RulesMapper rulesMapper = session.getMapper(RulesMapper.class);
             List<RulesDTO> rulesDTOList = rulesMapper.getRules(modelName);
 
             if (rulesDTOList.isEmpty()) {
                 throw new ParserException(0, "Empty rules");
             }
-
             Collection<Rule> rulesList = new ArrayList<>();
             for (RulesDTO ruleDTO : rulesDTOList) {
                 Expression expression = null;
@@ -70,16 +66,14 @@ public class ParserDB implements Parser {
         ArrayList<Expression> currentExpression = new ArrayList<>();
 
         List<ExpressionsDTO> expressionsList = expressionMapper.getParentExpression(expressionId);
-
-        for (int i = 0; i < expressionsList.size(); i++) {
-            String type = expressionsList.get(i).type_expression;
-
+        for (ExpressionsDTO anExpressionsList : expressionsList) {
+            String type = anExpressionsList.type_expression;
             if (type.equals("fact"))
-                currentExpression.add(new FactExpression(expressionsList.get(i).fact));
+                currentExpression.add(new FactExpression(anExpressionsList.fact));
             if (type.equals("and"))
-                currentExpression.add(new AndExpression(getExpression(session, expressionsList.get(i).id)));
+                currentExpression.add(new AndExpression(getExpression(session, anExpressionsList.id)));
             if (type.equals("or"))
-                currentExpression.add(new OrExpression(getExpression(session, expressionsList.get(i).id)));
+                currentExpression.add(new OrExpression(getExpression(session, anExpressionsList.id)));
         }
         return currentExpression;
     }

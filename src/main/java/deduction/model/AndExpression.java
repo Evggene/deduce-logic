@@ -1,13 +1,12 @@
 package deduction.model;
 
 
-import deduction.Wrapper;
 
 import javax.xml.bind.annotation.*;
 import java.util.Collection;
 
 
-public class AndExpression implements Expression {
+public class AndExpression implements Expression, Serializable {
 
     @XmlElements({
             @XmlElement(name = "fact", type = FactExpression.class),
@@ -34,13 +33,9 @@ public class AndExpression implements Expression {
         return true;
     }
 
-    public Collection<Expression> getExpressions() {
-        return expressions;
-    }
-
     @Override
-    public Object accept(Wrapper t) {
-        return t.wrap(this);
+    public void serialize(Serializer serializer) {
+        serializer.serializeAndExpression(expressions);
     }
 
     @Override

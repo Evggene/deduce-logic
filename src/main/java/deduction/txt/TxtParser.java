@@ -3,7 +3,6 @@ package deduction.txt;
 import deduction.model.*;
 import deduction.Parser;
 import deduction.ParserException;
-
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -11,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-public class ParserTxt implements Parser {
+public class TxtParser implements Parser {
 
     public static final String separator = "----------------------------------------------------------------";
     private int currentPos = 0;
