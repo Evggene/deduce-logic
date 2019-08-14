@@ -295,7 +295,7 @@ public class TxtParser implements Parser {
         }
 
 // PRINT
-       // System.out.println("parser txt " + resultExpression);
+    //    System.out.println("parser txt " + resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 

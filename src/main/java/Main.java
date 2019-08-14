@@ -63,6 +63,8 @@ public class Main {
         String outputFile = null;
         Engine.FormatEnum formatInputFile = null;
         Engine.FormatEnum formatOutputFile = null;
+        String inputConfig = null;
+        String outputConfig = null;
 
         switch (args[0]) {
             case "deduce":
@@ -87,7 +89,6 @@ public class Main {
                     inputFile = dbArgs[0];
                     formatInputFile = Engine.FormatEnum.DB;
                 }
-
                 engine.deduce(formatInputFile, new String[]{inputFile, dbArgs[1]});
                 return;
 
@@ -112,6 +113,7 @@ public class Main {
                 if (line.hasOption("dbin")) {
                     dbArgs = line.getOptionValues("dbin");
                     inputFile = dbArgs[0];
+                    inputConfig = dbArgs[1];
                     formatInputFile = Engine.FormatEnum.DB;
                 }
                 if (line.hasOption("txtout")) {
@@ -125,10 +127,12 @@ public class Main {
                 if (line.hasOption("dbout")) {
                     dbArgs = line.getOptionValues("dbout");
                     outputFile = dbArgs[0];
+                    outputConfig = dbArgs[1];
                     formatOutputFile = Engine.FormatEnum.DB;
                 }
 
-                engine.convert(inputFile, formatInputFile, new String[]{outputFile, dbArgs[1]}, formatOutputFile);
+                Engine.ConvertWrap convertWrap = new Engine.ConvertWrap(inputFile, formatInputFile, inputConfig, outputFile, formatOutputFile, outputConfig);
+                engine.convert(convertWrap);
                 return;
 
 
@@ -141,8 +145,6 @@ public class Main {
                     System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
                     return;
                 }
-                engine = new Engine(new ConsolePresenter());
-
                 if (line.hasOption("dbin")) {
                     dbArgs = line.getOptionValues("dbin");
                     engine.deleteDB(dbArgs);
@@ -156,6 +158,4 @@ public class Main {
                 System.out.println("Unknown command. Required: 'deduce', 'write', 'delete'");
         }
     }
-
-
 }

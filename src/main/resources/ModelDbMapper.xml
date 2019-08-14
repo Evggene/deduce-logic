@@ -2,7 +2,7 @@
 
 <mapper namespace="deduction.db.mappers.ModelMapper">
 
-    <insert id="insertModel" parameterType="deduction.db.dto.ModelDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="insert" parameterType="deduction.db.dto.ModelDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
       INSERT INTO model (name) VALUES(#{name})
     </insert>
 

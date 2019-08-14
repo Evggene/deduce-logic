@@ -2,8 +2,10 @@ package deduction.model;
 
 
 
+import deduction.SerializerException;
+
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
 
 
@@ -24,7 +26,7 @@ public class FactExpression implements Expression, Serializable {
     }
 
     @Override
-    public void serialize(Serializer serializer) {
+    public void serialize(Serializer serializer) throws IOException, SerializerException {
         serializer.serializeFactExpression(fact);
     }
 

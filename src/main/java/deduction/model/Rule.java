@@ -1,7 +1,10 @@
 package deduction.model;
 
+import deduction.SerializerException;
+
 import javax.xml.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Collection;
 
 
@@ -31,7 +34,7 @@ public class Rule implements Serializable {
     }
 
     @Override
-    public void serialize(Serializer serializer) {
+    public void serialize(Serializer serializer) throws IOException, SerializerException {
         serializer.serializeRule(expression, resultFact);
     }
 

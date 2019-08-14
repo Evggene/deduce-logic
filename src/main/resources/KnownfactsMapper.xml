@@ -2,7 +2,7 @@
 
 <mapper namespace="deduction.db.mappers.KnownFactsMapper">
 
-    <insert id="insertKnownFacts" parameterType="deduction.db.dto.KnownFactsDTO">
+    <insert id="insert" parameterType="deduction.db.dto.KnownFactsDTO">
         INSERT INTO knownfacts (model_id, fact) VALUES(#{model_id}, #{fact})
     </insert>
 

@@ -2,7 +2,10 @@
 package deduction.model;
 
 
+import deduction.SerializerException;
+
 import javax.xml.bind.annotation.*;
+import java.io.IOException;
 import java.util.Collection;
 
 
@@ -33,12 +36,12 @@ public class OrExpression implements Expression, Serializable {
     }
 
     @Override
-    public void serialize(Serializer serializer) {
+    public void serialize(Serializer serializer) throws IOException, SerializerException {
         serializer.serializeOrExpression(expressions);
     }
 
     @Override
     public String toString() {
-        return "Or{" + expressions + '}';
+        return "Or" + expressions ;
     }
 }

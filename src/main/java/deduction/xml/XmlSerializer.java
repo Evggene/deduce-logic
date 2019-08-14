@@ -1,8 +1,5 @@
 package deduction.xml;
 
-
-
-
 import deduction.model.Model;
 import deduction.Writer;
 
@@ -22,8 +19,4 @@ public class XmlSerializer implements Writer {
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         m.marshal(model, new File(filename));
     }
-
-
-
-
 }

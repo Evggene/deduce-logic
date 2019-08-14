@@ -13,6 +13,7 @@ public class ConsolePresenter implements Presenter {
     @Override
     public void showError(Throwable e) {
         System.err.print(e.getMessage());
+
     }
 
     @Override

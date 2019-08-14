@@ -1,8 +1,9 @@
 package deduction.db.mappers;
 
 import deduction.db.dto.ModelDTO;
+import deduction.SerializerException;
 
-public interface ModelMapper {
-    void insertModel(ModelDTO modelDTO);
-    void deleteModel(String name);
+public interface ModelMapper extends Mapper{
+    void insert(ModelDTO modelDTO) ;
+    void deleteModel(String name) ;
 }

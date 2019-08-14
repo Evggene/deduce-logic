@@ -1,11 +1,7 @@
 package deduction.db.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 
-
-
-public class ModelDTO {
+public class ModelDTO  implements DTO{
 
     public int id;
     public String name;

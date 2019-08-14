@@ -2,7 +2,7 @@
 
 <mapper namespace="deduction.db.mappers.RulesMapper">
 
-    <insert id="insertRulesDB" parameterType="deduction.db.dto.RulesDTO" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+    <insert id="insert" parameterType="deduction.db.dto.RulesDTO" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
         INSERT INTO rules (result_fact, model_id, expression_id) VALUES(#{result_fact}, #{model_id}, #{expression_id})
     </insert>
 

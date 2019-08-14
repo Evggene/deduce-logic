@@ -1,17 +1,18 @@
 package deduction.model;
 
-import deduction.Writer;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+
+
+import deduction.SerializerException;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
 public interface Serializer {
-    void serializeModel(Collection<Rule> rulesList, Set<String> knownFactsList);
-    void serializeRule(Expression expression, String resultFact);
-    void serializeAndExpression(Collection<Expression> expressions);
-    void serializeOrExpression(Collection<Expression> expressions);
-    void serializeFactExpression(String fact);
+    void serializeModel(Collection<Rule> rulesList, Set<String> knownFactsList) throws SerializerException, IOException;
+    void serializeRule(Expression expression, String resultFact) throws IOException, SerializerException;
+    void serializeAndExpression(Collection<Expression> expressions) throws IOException, SerializerException;
+    void serializeOrExpression(Collection<Expression> expressions) throws IOException, SerializerException;
+    void serializeFactExpression(String fact) throws IOException, SerializerException;
 }

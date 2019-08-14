@@ -2,7 +2,7 @@
 
 <mapper namespace="deduction.db.mappers.ExpressionsMapper">
 
-    <insert id="insertElement" parameterType="deduction.db.dto.ExpressionsDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="insert" parameterType="deduction.db.dto.ExpressionsDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO expressions (parent_id, fact, type_id)
             select #{parent_id}, #{fact}, id from type_of_expression where type_expression = #{type_expression}
     </insert>

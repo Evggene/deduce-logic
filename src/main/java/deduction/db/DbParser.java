@@ -10,22 +10,27 @@ import deduction.db.mappers.RulesMapper;
 import deduction.model.*;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
 
 
 public class DbParser implements Parser {
 
-    private SqlSessionFactory ssf;
+    private String configFile;
 
-    public DbParser(SqlSessionFactory ssf) {
-        this.ssf = ssf;
+
+    public DbParser(String configFile) {
+        this.configFile = configFile;
     }
 
 
     @Override
-    public Model parse(String modelName) throws ParserException {
-        try (SqlSession session = ssf.openSession()) {
+    public Model parse(String modelName) throws ParserException, FileNotFoundException {
+        SqlSessionFactory ssf = new SqlSessionFactoryBuilder().build(new FileReader(configFile));
+        try ( SqlSession session = ssf.openSession()) {
 
             KnownFactsMapper factsMapper = session.getMapper(KnownFactsMapper.class);
             Set<String> knownFacts = factsMapper.getKnownFacts(modelName);
