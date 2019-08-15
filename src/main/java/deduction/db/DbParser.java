@@ -16,16 +16,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 
-
 public class DbParser implements Parser {
 
     private String configFile;
 
-
     public DbParser(String configFile) {
         this.configFile = configFile;
     }
-
 
     @Override
     public Model parse(String modelName) throws ParserException, FileNotFoundException {
@@ -47,39 +44,43 @@ public class DbParser implements Parser {
             Collection<Rule> rulesList = new ArrayList<>();
             for (RulesDTO ruleDTO : rulesDTOList) {
                 Expression expression = null;
-                String type = ruleDTO.type_expression;
-
-                if (type.equals("fact")) {
-                    expression = new FactExpression(ruleDTO.fact);
+                switch (ruleDTO.type_expression) {
+                    case and:
+                        expression = new AndExpression(parseExpressions(session, ruleDTO.id));
+                        break;
+                    case or:
+                        expression = new OrExpression(parseExpressions(session, ruleDTO.id));
+                        break;
+                    case fact:
+                        expression = new FactExpression(ruleDTO.fact);
+                        break;
                 }
-                if (type.equals("and")) {
-                    expression = new AndExpression(getExpression(session, ruleDTO.id));
-                }
-                if (type.equals("or")) {
-                    expression = new OrExpression(getExpression(session, ruleDTO.id));
-                }
-                System.out.println(expression);
+      //PRINT
+     //           System.out.println(expression);
                 rulesList.add(new Rule(expression, ruleDTO.result_fact));
             }
             return new Model(rulesList, knownFacts);
         }
     }
 
-
-    private Collection<Expression> getExpression(SqlSession session, int expressionId) {
+    private Collection<Expression> parseExpressions(SqlSession session, int expressionId) {
         ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
-        ArrayList<Expression> currentExpression = new ArrayList<>();
+        ArrayList<Expression> currentExpressions = new ArrayList<>();
 
-        List<ExpressionsDTO> expressionsList = expressionMapper.getParentExpression(expressionId);
-        for (ExpressionsDTO anExpressionsList : expressionsList) {
-            String type = anExpressionsList.type_expression;
-            if (type.equals("fact"))
-                currentExpression.add(new FactExpression(anExpressionsList.fact));
-            if (type.equals("and"))
-                currentExpression.add(new AndExpression(getExpression(session, anExpressionsList.id)));
-            if (type.equals("or"))
-                currentExpression.add(new OrExpression(getExpression(session, anExpressionsList.id)));
+        List<ExpressionsDTO> expressionsList = expressionMapper.getChildExpressions(expressionId);
+        for (ExpressionsDTO expressionDTO : expressionsList) {
+            switch (expressionDTO.type_expression) {
+                case and:
+                    currentExpressions.add(new AndExpression(parseExpressions(session, expressionDTO.id)));
+                    break;
+                case or:
+                    currentExpressions.add(new OrExpression(parseExpressions(session, expressionDTO.id)));
+                    break;
+                case fact:
+                    currentExpressions.add(new FactExpression(expressionDTO.fact));
+                    break;
+            }
         }
-        return currentExpression;
+        return currentExpressions;
     }
 }

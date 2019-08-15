@@ -1,7 +1,6 @@
 package deduction.db.dto;
 
-
-public class ModelDTO  implements DTO{
+public class ModelDTO {
 
     public int id;
     public String name;

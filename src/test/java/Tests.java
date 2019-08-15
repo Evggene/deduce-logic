@@ -32,7 +32,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test111() {                           // валидный файл, тест на логику
+    public void test111() throws Exception {                           // валидный файл, тест на логику
 
         File s = new File(getClass().getResource("simple_logic_set.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -41,7 +41,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test21() {                           // валидный файл посложнее, тест на логику
+    public void test21() throws Exception {                           // валидный файл посложнее, тест на логику
 
         File s = new File(getClass().getResource("valid.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -51,7 +51,7 @@ public class Tests extends Assert {
 
 
     @Test
-    public void test00() {                           // неправильный путь
+    public void test00() throws Exception {                           // неправильный путь
 
         File s = new File("про");
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -61,7 +61,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test2() {                           // пустой файл
+    public void test2() throws Exception {                           // пустой файл
 
         File s = new File(getClass().getResource("empty_file.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -70,7 +70,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test3() {                           // ошибка в правилах: правила отсутствуют
+    public void test3() throws Exception {                           // ошибка в правилах: правила отсутствуют
 
         File s = new File(getClass().getResource("rule_error_emptyRule.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -79,7 +79,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test4() {                           // ошибка в фактах: факты отсутствуют
+    public void test4() throws Exception {                           // ошибка в фактах: факты отсутствуют
 
         File s = new File(getClass().getResource("facts_error_emptyFacts.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -88,7 +88,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test5() {                           // невалидный файл: нет разделителя
+    public void test5() throws Exception {                           // невалидный файл: нет разделителя
 
         File s = new File(getClass().getResource("absent_separator.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -97,7 +97,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test7() {                           // ошибка в данных - неверный логический символ
+    public void test7() throws Exception {                           // ошибка в данных - неверный логический символ
 
         File s = new File(getClass().getResource("rules_error.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -106,7 +106,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test72() {                           // ошибка в данных - неверный логический символ
+    public void test72() throws Exception {                           // ошибка в данных - неверный логический символ
 
         File s = new File(getClass().getResource("rules_error_2.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -115,7 +115,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test73() {                           // ошибка в данных - неверный логический символ
+    public void test73() throws Exception {                           // ошибка в данных - неверный логический символ
 
         File s = new File(getClass().getResource("rules_error_3.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -124,7 +124,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test8() {                           // ошибка в данных - отсутствует ->
+    public void test8() throws Exception {                           // ошибка в данных - отсутствует ->
 
         File s = new File(getClass().getResource("missing_pointer.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -133,7 +133,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test9() {                           // ошибка в данных - неправильный разделитель
+    public void test9() throws Exception {                           // ошибка в данных - неправильный разделитель
 
         File s = new File(getClass().getResource("wrong_separator.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -142,7 +142,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test10() {                           // ошибка в данных - перепутаны правила и факты
+    public void test10() throws Exception {                           // ошибка в данных - перепутаны правила и факты
 
         File s = new File(getClass().getResource("wrong_rules_facts.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -151,7 +151,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test11() {                           // ошибка в правилах - пустая линия
+    public void test11() throws Exception {                           // ошибка в правилах - пустая линия
 
         File s = new File(getClass().getResource("missing_Line_rules.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -160,7 +160,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test12() {                           // ошибка в правилах - висячая строка
+    public void test12() throws Exception {                           // ошибка в правилах - висячая строка
 
         File s = new File(getClass().getResource("hanging_rule.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -169,7 +169,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test221() {                           // ошибка в правилах - пустая линия
+    public void test221() throws Exception {                           // ошибка в правилах - пустая линия
 
         File s = new File(getClass().getResource("wrong_fact_space.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -178,7 +178,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test222() {                           // ошибка в правилах - неверный выводимый факт
+    public void test222() throws Exception {                           // ошибка в правилах - неверный выводимый факт
 
         File s = new File(getClass().getResource("rules_error_4.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -187,7 +187,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test223() {                           // ошибка в правилах - ошибка в факте
+    public void test223() throws Exception {                           // ошибка в правилах - ошибка в факте
 
         File s = new File(getClass().getResource("rules_error_5.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -196,7 +196,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test224() {                           // ошибка в фактах
+    public void test224() throws Exception {                           // ошибка в фактах
 
         File s = new File(getClass().getResource("rules_error_6.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -205,7 +205,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test225() {                           // сложные правила
+    public void test225() throws Exception {                           // сложные правила
 
         File s = new File(getClass().getResource("validS.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -214,7 +214,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test226() {                           // сложные правила
+    public void test226() throws Exception {                           // сложные правила
 
         File s = new File(getClass().getResource("simple_brackets.txt").getFile());
         Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
@@ -223,7 +223,7 @@ public class Tests extends Assert {
     }
 
     @Test
-    public void test227() {                           // сложные правила
+    public void test227() throws Exception {                           // сложные правила
 
         File s = new File(getClass().getResource("first.xml").getFile());
         Main.main(new String[]{"deduce", "-xmlin", s.getAbsolutePath()});
@@ -233,7 +233,7 @@ public class Tests extends Assert {
 
 
     @Test
-    public void test228() throws IOException {                           // проверка конвертации xml в txt
+    public void test228() throws Exception {                           // проверка конвертации xml в txt
 
         File input = new File(getClass().getResource("logic.xml").getFile());
         File output = new File(("checkxmllogic.txt"));

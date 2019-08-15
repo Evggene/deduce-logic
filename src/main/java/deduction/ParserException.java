@@ -1,6 +1,4 @@
-
 package deduction;
-
 
 public class ParserException extends Exception{
     public ParserException(int errorLine, String message) {

@@ -1,7 +1,6 @@
 package deduction.db.dto;
 
-
-public class KnownFactsDTO implements DTO {
+public class KnownFactsDTO  {
 
     public int model_id;
     public String fact;

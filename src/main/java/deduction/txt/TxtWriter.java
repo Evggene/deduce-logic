@@ -1,6 +1,5 @@
 package deduction.txt;
 
-
 import deduction.SerializerException;
 import deduction.model.*;
 import deduction.Writer;
@@ -10,12 +9,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-
 public class TxtWriter implements Writer, Serializer {
 
     private int andDepth;
     private FileWriterWrapper file = null;
-
 
     public void write(String filename, Model model) throws IOException, SerializerException {
         try {
@@ -26,6 +23,13 @@ public class TxtWriter implements Writer, Serializer {
         }
     }
 
+    @Override
+    public void delete(String fileName) throws SerializerException, FileNotFoundException {
+        File file = new File(fileName);
+        if (!file.delete()) {
+            throw new SerializerException("Cannot remove file");
+        }
+    }
 
     @Override
     public void serializeModel(Collection<Rule> rulesList, Set<String> knownFactsList) throws SerializerException, IOException {
@@ -42,7 +46,6 @@ public class TxtWriter implements Writer, Serializer {
             file.write(iterator.next());
         }
     }
-
 
     @Override
     public void serializeRule(Expression expression, String resultFact) throws IOException, SerializerException {

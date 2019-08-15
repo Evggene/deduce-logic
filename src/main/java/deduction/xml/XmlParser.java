@@ -15,7 +15,6 @@ import java.io.IOException;
 
 public class XmlParser implements Parser {
 
-
     public Model parse(String filename) throws SAXException, IOException, JAXBException {
         Schema schema;
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");

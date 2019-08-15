@@ -1,8 +1,5 @@
 package deduction.model;
 
-
-
-
 import deduction.SerializerException;
 
 import java.io.IOException;

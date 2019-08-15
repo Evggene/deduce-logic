@@ -3,12 +3,12 @@ package deduction.txt;
 import deduction.model.*;
 import deduction.Parser;
 import deduction.ParserException;
+
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-
 
 public class TxtParser implements Parser {
 
@@ -16,21 +16,18 @@ public class TxtParser implements Parser {
     private int currentPos = 0;
     private int currentLine = 0;
 
-    enum FileState {
+    private enum FileState {
         RULE, KNOWN_FACTS, EOF
     }
-
-    enum ExpressionState {
+    private enum ExpressionState {
         BeforeFact, UnderscoreFact, Fact,
         BeforeOperator, AndOperator, OrOperator
     }
-
-    enum RuleState {
+    private enum RuleState {
         Begin, Imply,
         BeforeFact, UnderscoreFact, Fact, EOL
     }
-
-    enum KnownFactsState {
+    private enum KnownFactsState {
         BeforeFact, UnderscoreFact, Fact, EOL
     }
 
@@ -41,9 +38,7 @@ public class TxtParser implements Parser {
         Set<String> resultsList = new HashSet<>();
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get(filename), Charset.forName("UTF-8"))) {
-
             String readLine;
-
             FileState fileState = FileState.RULE;
 
             while ((readLine = br.readLine()) != null) {
@@ -109,7 +104,6 @@ public class TxtParser implements Parser {
                     }
                     throw new ParserException(currentLine, "invalid rule syntax");
 
-
                 case UnderscoreFact:
                     if (currentChar == '_') {
                         fact.append(currentChar);
@@ -155,7 +149,6 @@ public class TxtParser implements Parser {
                     fact.append(currentChar);
                     break;
 
-
                 case BeforeOperator:
                     if (currentChar == '-') {
                         return assembleExpression(orElements, andElements, currentExpression);
@@ -176,7 +169,6 @@ public class TxtParser implements Parser {
                     }
                     throw new ParserException(currentLine, "invalid rule syntax");
 
-
                 case AndOperator:
                     if (currentChar == '&') {
                         andElements.add(currentExpression);
@@ -184,7 +176,6 @@ public class TxtParser implements Parser {
                         break;
                     }
                     throw new ParserException(currentLine, "invalid rule syntax (wrong operator)");
-
 
                 case OrOperator:
                     if (currentChar == '|') {
@@ -225,7 +216,6 @@ public class TxtParser implements Parser {
 
         for (; currentPos < rule.length(); currentPos++) {
             char currentChar = rule.charAt(currentPos);
-
             switch (state) {
 
                 case Begin:
@@ -234,7 +224,7 @@ public class TxtParser implements Parser {
                         break;
                     }
                     throw new ParserException(currentLine, "invalid rule syntax");
-                    
+
                 case Imply:
                     if (currentChar == '>') {
                         state = RuleState.BeforeFact;
@@ -270,7 +260,6 @@ public class TxtParser implements Parser {
                     }
                     throw new ParserException(currentLine, "invalid rule syntax (wrong symbol in deducing fact)");
 
-
                 case Fact:
                     if (currentChar == ' ') {
                         state = RuleState.EOL;
@@ -282,7 +271,6 @@ public class TxtParser implements Parser {
                     fact.append(currentChar);
                     break;
 
-
                 case EOL:
                     if (currentChar == ' ') {
                         break;
@@ -293,9 +281,8 @@ public class TxtParser implements Parser {
         if (state != RuleState.Fact && state != RuleState.EOL) {
             throw new ParserException(currentLine, "invalid rule syntax");
         }
-
 // PRINT
-    //    System.out.println("parser txt " + resultExpression);
+        //    System.out.println("parser txt " + resultExpression);
         return new Rule(resultExpression, fact.toString());
     }
 
@@ -306,7 +293,6 @@ public class TxtParser implements Parser {
         StringBuilder fact = new StringBuilder();
 
         for (int i = 0; i < factsString.length(); i++) {
-
             switch (state) {
 
                 case BeforeFact:
@@ -354,7 +340,6 @@ public class TxtParser implements Parser {
                     }
                     throw new ParserException(currentLine, "error with known facts");
 
-
                 case EOL:
                     if (factsString.charAt(i) == ' ') {
                         break;
@@ -370,7 +355,6 @@ public class TxtParser implements Parser {
         }
         if (!fact.toString().trim().isEmpty())
             knownFactsList.add(fact.toString().trim());
-
         if (state != KnownFactsState.Fact && state != KnownFactsState.EOL)
             throw new ParserException(currentLine, "error with known facts");
         if (knownFactsList.isEmpty()) throw new
@@ -378,6 +362,4 @@ public class TxtParser implements Parser {
 
         return knownFactsList;
     }
-
-
 }

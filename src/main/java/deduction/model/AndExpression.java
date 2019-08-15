@@ -1,13 +1,10 @@
 package deduction.model;
 
-
-
 import deduction.SerializerException;
 
 import javax.xml.bind.annotation.*;
 import java.io.IOException;
 import java.util.Collection;
-
 
 public class AndExpression implements Expression, Serializable {
 

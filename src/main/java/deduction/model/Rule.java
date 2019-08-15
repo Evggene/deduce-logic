@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.*;
 import java.io.IOException;
 import java.util.Collection;
 
-
 public class Rule implements Serializable {
 
     @XmlElements({

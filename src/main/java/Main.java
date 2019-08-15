@@ -7,7 +7,7 @@ import org.apache.commons.cli.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         if (args.length == 0) {
             System.out.println("Empty arguments");
@@ -58,7 +58,7 @@ public class Main {
         }
 
         Engine engine = new Engine(new ConsolePresenter());
-        String dbArgs[] = new String[2];
+        String dbArgs[];
         String inputFile = null;
         String outputFile = null;
         Engine.FormatEnum formatInputFile = null;
@@ -86,10 +86,11 @@ public class Main {
                 }
                 if (line.hasOption("dbin")) {
                     dbArgs = line.getOptionValues("dbin");
-                    inputFile = dbArgs[0];
                     formatInputFile = Engine.FormatEnum.DB;
+                    inputFile = dbArgs[0];
+                    inputConfig = dbArgs[1];
                 }
-                engine.deduce(formatInputFile, new String[]{inputFile, dbArgs[1]});
+                engine.deduce(formatInputFile, inputFile, inputConfig);
                 return;
 
 
@@ -111,10 +112,10 @@ public class Main {
                     formatInputFile = Engine.FormatEnum.XML;
                 }
                 if (line.hasOption("dbin")) {
+                    formatInputFile = Engine.FormatEnum.DB;
                     dbArgs = line.getOptionValues("dbin");
                     inputFile = dbArgs[0];
                     inputConfig = dbArgs[1];
-                    formatInputFile = Engine.FormatEnum.DB;
                 }
                 if (line.hasOption("txtout")) {
                     outputFile = line.getOptionValue("txtout");
@@ -125,14 +126,12 @@ public class Main {
                     formatOutputFile = Engine.FormatEnum.XML;
                 }
                 if (line.hasOption("dbout")) {
+                    formatOutputFile = Engine.FormatEnum.DB;
                     dbArgs = line.getOptionValues("dbout");
                     outputFile = dbArgs[0];
                     outputConfig = dbArgs[1];
-                    formatOutputFile = Engine.FormatEnum.DB;
                 }
-
-                Engine.ConvertWrap convertWrap = new Engine.ConvertWrap(inputFile, formatInputFile, inputConfig, outputFile, formatOutputFile, outputConfig);
-                engine.convert(convertWrap);
+                engine.convert(inputFile, formatInputFile, inputConfig, outputFile, formatOutputFile, outputConfig);
                 return;
 
 
@@ -145,12 +144,21 @@ public class Main {
                     System.out.println("Wrong number of arguments: " + line.getArgList().get(1));
                     return;
                 }
-                if (line.hasOption("dbin")) {
-                    dbArgs = line.getOptionValues("dbin");
-                    engine.deleteDB(dbArgs);
-                    return;
+                if (line.hasOption("txtin")) {
+                    inputFile = line.getOptionValue("txtin");
+                    formatInputFile = Engine.FormatEnum.TXT;
                 }
-                System.out.println("Command 'delete' may have only '-dbin' argument");
+                if (line.hasOption("xmlin")) {
+                    inputFile = line.getOptionValue("xmlin");
+                    formatInputFile = Engine.FormatEnum.XML;
+                }
+                if (line.hasOption("dbin")) {
+                    formatInputFile = Engine.FormatEnum.DB;
+                    dbArgs = line.getOptionValues("dbin");
+                    inputFile = dbArgs[0];
+                    inputConfig = dbArgs[1];
+                }
+                engine.delete(formatInputFile, inputFile, inputConfig);
                 return;
 
 

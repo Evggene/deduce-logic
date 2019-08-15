@@ -1,12 +1,8 @@
 package deduction.db;
 
-
 import deduction.SerializerException;
 import deduction.Writer;
-import deduction.db.dto.ExpressionsDTO;
-import deduction.db.dto.KnownFactsDTO;
-import deduction.db.dto.ModelDTO;
-import deduction.db.dto.RulesDTO;
+import deduction.db.dto.*;
 import deduction.db.mappers.*;
 import deduction.model.Expression;
 import deduction.model.Model;
@@ -18,20 +14,16 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-
 public class DbWriter implements Writer, Serializer {
 
     private String configFile;
-    private DbWriterWrapper session;
+    private DbSessionWrapper session;
     private int modelId;
     private Integer expressionId;
-    private ArrayDeque<Integer> idNumbers;
-
 
     public DbWriter(String configFile) {
         this.configFile = configFile;
@@ -41,15 +33,14 @@ public class DbWriter implements Writer, Serializer {
     public void write(String modelName, Model model) throws SerializerException, IOException {
         try {
             SqlSessionFactory ssf = new SqlSessionFactoryBuilder().build(new FileReader(configFile));
-            session = new DbWriterWrapper(ssf);
+            session = new DbSessionWrapper(ssf);
 
-            Mapper modelMapper = session.getMapper(ModelMapper.class);
+            ModelMapper modelMapper = session.getMapper(ModelMapper.class);
             ModelDTO modelDTO = new ModelDTO(modelName);
-            session.insert(modelMapper, modelDTO);
+            modelMapper.insert(modelDTO);
             modelId = modelDTO.id;
             model.serialize(this);
             session.commit();
-
         } finally {
             session.close();
         }
@@ -57,9 +48,9 @@ public class DbWriter implements Writer, Serializer {
 
     @Override
     public void serializeModel(Collection<Rule> rulesList, Set<String> knownFactsList) throws SerializerException, IOException {
-        Mapper knownFactsMapper = session.getMapper(KnownFactsMapper.class);
+        KnownFactsMapper knownFactsMapper = session.getMapper(KnownFactsMapper.class);
         for (String fact : knownFactsList) {
-            session.insert(knownFactsMapper, new KnownFactsDTO(modelId, fact));
+            knownFactsMapper.insert(new KnownFactsDTO(modelId, fact));
         }
         for (Rule rule : rulesList) {
             rule.serialize(this);
@@ -68,80 +59,78 @@ public class DbWriter implements Writer, Serializer {
 
     @Override
     public void serializeRule(Expression expression, String resultFact) throws SerializerException, IOException {
-        idNumbers = new ArrayDeque<>();
         expressionId = null;
         expression.serialize(this);
-        Mapper rulesDBMapper = session.getMapper(RulesMapper.class);
+        RulesMapper rulesDBMapper = session.getMapper(RulesMapper.class);
         RulesDTO rulesDTO = new RulesDTO(resultFact, modelId, expressionId);
-        session.insert(rulesDBMapper, rulesDTO);
-        idNumbers = null;
+        rulesDBMapper.insert(rulesDTO);
     }
 
     @Override
     public void serializeAndExpression(Collection<Expression> expressions) throws SerializerException, IOException {
-        Mapper expressionMapper = session.getMapper(ExpressionsMapper.class);
-        ExpressionsDTO expressionsDTO = new ExpressionsDTO(expressionId, null, "and");
-        session.insert(expressionMapper, expressionsDTO);
-        idNumbers.add(expressionsDTO.id);
-
+        ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+        ExpressionsDTO expressionsDTO = new ExpressionsDTO(expressionId, null, ExpressionsDTO.TypeExpression.and);
+        expressionMapper.insert(expressionsDTO);
         for (Expression expression : expressions) {
-            expressionId = idNumbers.getLast();
+            expressionId = expressionsDTO.id;
             expression.serialize(this);
         }
-        expressionId = idNumbers.pollLast();
+        expressionId = expressionsDTO.id;
     }
 
     @Override
     public void serializeOrExpression(Collection<Expression> expressions) throws SerializerException, IOException {
-        Mapper expressionMapper = session.getMapper(ExpressionsMapper.class);
-        ExpressionsDTO expressionsDTO = new ExpressionsDTO(expressionId, null, "or");
-        session.insert(expressionMapper, expressionsDTO);
-        idNumbers.add(expressionsDTO.id);
-
+        ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+        ExpressionsDTO expressionsDTO = new ExpressionsDTO(expressionId, null, ExpressionsDTO.TypeExpression.or);
+        expressionMapper.insert(expressionsDTO);
         for (Expression expression : expressions) {
-            expressionId = idNumbers.getLast();
+            expressionId = expressionsDTO.id;
             expression.serialize(this);
         }
-        expressionId = idNumbers.pollLast();
+        expressionId = expressionsDTO.id;
     }
 
     @Override
     public void serializeFactExpression(String fact) throws SerializerException {
-        Mapper expressionMapper = session.getMapper(ExpressionsMapper.class);
-        ExpressionsDTO expressionsDTO = new ExpressionsDTO(expressionId, fact, "fact");
-        session.insert(expressionMapper, expressionsDTO);
+        ExpressionsMapper expressionMapper = session.getMapper(ExpressionsMapper.class);
+        ExpressionsDTO expressionsDTO = new ExpressionsDTO(expressionId, fact, ExpressionsDTO.TypeExpression.fact);
+        expressionMapper.insert(expressionsDTO);
         expressionId = expressionsDTO.id;
     }
 
-
-    public void deleteModelDB(String modelName) throws SerializerException, FileNotFoundException {
+    public void delete(String modelName) throws SerializerException, FileNotFoundException {
         SqlSessionFactory ssf = new SqlSessionFactoryBuilder().build(new FileReader(configFile));
         try {
-            session = new DbWriterWrapper(ssf);
+            session = new DbSessionWrapper(ssf);
 
-            Mapper rulesMapper = session.getMapper(RulesMapper.class);
-
-            List<RulesDTO> rulesDTOList = ((RulesMapper) rulesMapper).getRules(modelName);
+            RulesMapper rulesMapper = session.getMapper(RulesMapper.class);
+            List<RulesDTO> rulesDTOList = rulesMapper.getRules(modelName);
 
             ExpressionsMapper expressionDTOMapper = session.getMapper(ExpressionsMapper.class);
             for (RulesDTO ruleDB : rulesDTOList) {
-
-                expressionDTOMapper.deleteExpression(ruleDB.id);
-                session.commit();
-            }
-            for (RulesDTO ruleDB : rulesDTOList) {
-                ((RulesMapper) rulesMapper).deleteRules(ruleDB.id);
-                session.commit();
+                int expressionId = ruleDB.expression_id;
+                rulesMapper.deleteRule(ruleDB.id);
+                expressionDTOMapper.deleteExpression(expressionId);
+                deleteExpression(expressionId);
             }
             KnownFactsMapper factsMapper = session.getMapper(KnownFactsMapper.class);
             factsMapper.deleteKnownFacts(modelName);
-            session.commit();
 
             ModelMapper modelMapper = session.getMapper(ModelMapper.class);
             modelMapper.deleteModel(modelName);
+            session.commit();
             System.out.println("Delete model: " + "'" + modelName + "'" + " is successfully");
         } finally {
             session.close();
+        }
+    }
+
+    private void deleteExpression(int id) throws SerializerException {
+        ExpressionsMapper expressionDTOMapper = session.getMapper(ExpressionsMapper.class);
+        expressionDTOMapper.deleteExpression(id);
+        List<ExpressionsDTO> expressionsDTOList = expressionDTOMapper.getChildExpressions(id);
+        for (ExpressionsDTO expressions : expressionsDTOList) {
+            deleteExpression(expressions.id);
         }
     }
 
