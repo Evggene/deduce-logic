@@ -122,6 +122,7 @@ public class DbWriter implements Writer, Serializer {
             System.out.println("Delete model: " + "'" + modelName + "'" + " is successfully");
         } finally {
             session.close();
+
         }
     }
 
