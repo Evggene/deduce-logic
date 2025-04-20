@@ -1,4 +1,4 @@
-
+package red;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
