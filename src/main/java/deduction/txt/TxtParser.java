@@ -6,6 +6,7 @@ import deduction.ParserException;
 
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -37,7 +38,7 @@ public class TxtParser implements Parser {
         Collection<Rule> rulesList = new ArrayList<>();
         Set<String> resultsList = new HashSet<>();
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(filename), Charset.forName("UTF-8"))) {
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(filename), StandardCharsets.UTF_8)) {
             String readLine;
             FileState fileState = FileState.RULE;
 

@@ -4,7 +4,7 @@ import deduction.Engine;
 import deduction.ConsolePresenter;
 import org.apache.commons.cli.*;
 
-
+//https://github.com/EvgenyBezlepkin/deduceLogicStatement-app.git
 public class Main {
 
     public static void main(String[] args) throws Exception {
@@ -58,7 +58,7 @@ public class Main {
         }
 
         Engine engine = new Engine(new ConsolePresenter());
-        String dbArgs[];
+        String[] dbArgs;
         String inputFile = null;
         String outputFile = null;
         Engine.FormatEnum formatInputFile = null;
