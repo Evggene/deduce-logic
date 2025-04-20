@@ -4,6 +4,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import red.Main;
+
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -257,7 +259,7 @@ public class Tests {
 //        File input = new File(getClass().getResource("first.txt").getFile());
 //        File output = new File("checkfirstxmlc.xml");
 //        File check = new File(getClass().getResource("logic.xml").getFile());
-//        Main.main(new String[]{"write", "-txtin", input.getAbsolutePath(), "-xmlout", output.getAbsolutePath()});
+//        red.Main.main(new String[]{"write", "-txtin", input.getAbsolutePath(), "-xmlout", output.getAbsolutePath()});
 //
 //        assertEquals("Conversion is done", outContent.toString());
 //        assertEquals("The files differ!",
@@ -272,7 +274,7 @@ public class Tests {
 //
 //        File output = new File("dbcheck.txt");
 //        File check = new File(getClass().getResource("checkxmllogic2.txt").getFile());
-//        Main.main(new String[]{"write", "-dbin", "checkLogic", "D:\\config.xml", "-txtout", output.getAbsolutePath()});
+//        red.Main.main(new String[]{"write", "-dbin", "checkLogic", "D:\\config.xml", "-txtout", output.getAbsolutePath()});
 //
 //        //assertEquals("Conversion is done", outContent.toString());
 //        assertEquals("The files differ!",
