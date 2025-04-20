@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Mapper
 public interface KnownFactsMapper {
-    void insert(KnownFactsDTO knownfacts);
+    void insert(KnownFactsDTO knownFacts);
     Set<String> getKnownFacts(String name);
     void deleteKnownFacts(String name);
 }

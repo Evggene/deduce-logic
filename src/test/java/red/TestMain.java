@@ -27,21 +27,13 @@ public class TestMain {
 
     @Test
     void test_startApplication_contextLoads() {
-        postgreSQLContainer.start();
         Assertions.assertNotNull(applicationContext);
     }
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:13")
-            .withDatabaseName("mydb")
+            .withDatabaseName("postgres")
             .withUsername("myuser")
             .withPassword("mypass");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
 
 }

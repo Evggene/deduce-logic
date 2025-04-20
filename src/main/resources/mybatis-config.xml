@@ -10,7 +10,10 @@
     </settings>
 
     <mappers>
-        <mapper resource="red/resources/ExpressionDbMapper.xml"/>
+        <mapper resource="red/deduction/db/mappers/ExpressionDbMapper.xml"/>
+        <mapper resource="red/deduction/db/mappers/KnownFactsMapper.xml"/>
+        <mapper resource="red/deduction/db/mappers/ModelDbMapper.xml"/>
+        <mapper resource="red/deduction/db/mappers/RulesDbMapper.xml"/>
     </mappers>
 
 </configuration>
