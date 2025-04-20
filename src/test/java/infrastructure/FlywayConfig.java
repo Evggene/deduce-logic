@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 @Configuration
 public class FlywayConfig {
 
+
     @Bean
     public Flyway flyway(DataSource dataSource) {
         return Flyway.configure()
