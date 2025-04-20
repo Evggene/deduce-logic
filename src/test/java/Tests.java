@@ -1,23 +1,26 @@
 
 
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
-
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import java.io.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class Tests extends Assert {
 
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.err;
+public class Tests {
 
-    @Before
-    public void setUpStreams() {
+    private static final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private static final PrintStream originalOut = System.err;
+
+    @BeforeAll
+    public static void setUpStreams() {
         System.setOut(new PrintStream(outContent));
     }
 
-    @After
-    public void restoreStreams() {
+    @AfterAll
+    public static void restoreStreams() {
         System.setOut(originalOut);
     }
 
