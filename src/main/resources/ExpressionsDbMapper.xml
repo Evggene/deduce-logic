@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.db.mappers.ExpressionsMapper">
+<mapper namespace="red.deduction.db.mappers.ExpressionsMapper">
 
-    <insert id="insert" parameterType="deduction.db.dto.ExpressionsDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="insert" parameterType="red.deduction.db.dto.ExpressionsDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO expressions (parent_id, fact, type_id)
             select #{parent_id}, #{fact}, id from type_of_expression where type_expression = #{type_expression}
     </insert>
@@ -11,7 +11,7 @@
         DELETE FROM expressions WHERE expressions.id=#{expressions.id}
     </delete>
 
-    <select id="getChildExpressions" parameterType="int" resultType="deduction.db.dto.ExpressionsDTO">
+    <select id="getChildExpressions" parameterType="int" resultType="red.deduction.db.dto.ExpressionsDTO">
         select expressions.id, parent_id, fact, type_expression from expressions join type_of_expression
         on expressions.type_id = type_of_expression.id where expressions.parent_id=#{expression_id} ORDER BY expressions.id
     </select>

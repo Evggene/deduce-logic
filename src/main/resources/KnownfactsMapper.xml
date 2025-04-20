@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.db.mappers.KnownFactsMapper">
+<mapper namespace="red.deduction.db.mappers.KnownFactsMapper">
 
-    <insert id="insert" parameterType="deduction.db.dto.KnownFactsDTO">
+    <insert id="insert" parameterType="red.deduction.db.dto.KnownFactsDTO">
         INSERT INTO knownfacts (model_id, fact) VALUES(#{model_id}, #{fact})
     </insert>
 

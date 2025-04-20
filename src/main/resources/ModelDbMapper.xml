@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="deduction.db.mappers.ModelMapper">
+<mapper namespace="red.deduction.db.mappers.ModelMapper">
 
-    <insert id="insert" parameterType="deduction.db.dto.ModelDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="insert" parameterType="red.deduction.db.dto.ModelDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
       INSERT INTO model (name) VALUES(#{name})
     </insert>
 
