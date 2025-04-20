@@ -14,7 +14,6 @@ public class MyBatisTest extends TestMain{
     void a() {
         KnownFactsDTO dto = new KnownFactsDTO();
         dto.fact = "1";
-        dto.model_id = 1;
         knownFactsMapper.insert(dto);
     }
 

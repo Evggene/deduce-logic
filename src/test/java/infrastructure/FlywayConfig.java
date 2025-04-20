@@ -1,4 +1,4 @@
-package red.infrastructure;
+package infrastructure;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
