@@ -1,7 +1,7 @@
 package deduction.xml;
 
 import deduction.model.Model;
-import deduction.Parser;
+import deduction.parser.Parser;
 
 import org.xml.sax.SAXException;
 import javax.xml.bind.JAXBContext;

@@ -1,7 +1,7 @@
 
 
 import deduction.Engine;
-import deduction.ConsolePresenter;
+import deduction.presenter.ConsolePresenter;
 import org.apache.commons.cli.*;
 
 //https://github.com/EvgenyBezlepkin/deduceLogicStatement-app.git

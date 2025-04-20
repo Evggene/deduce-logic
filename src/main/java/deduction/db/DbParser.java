@@ -1,7 +1,7 @@
 package deduction.db;
 
-import deduction.Parser;
-import deduction.ParserException;
+import deduction.parser.Parser;
+import deduction.parser.ParserException;
 import deduction.db.dto.ExpressionsDTO;
 import deduction.db.dto.RulesDTO;
 import deduction.db.mappers.ExpressionsMapper;
@@ -18,7 +18,7 @@ import java.util.*;
 
 public class DbParser implements Parser {
 
-    private String configFile;
+    private final String configFile;
 
     public DbParser(String configFile) {
         this.configFile = configFile;

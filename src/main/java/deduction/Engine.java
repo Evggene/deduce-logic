@@ -2,6 +2,10 @@ package deduction;
 
 import deduction.db.DbParser;
 import deduction.model.Model;
+import deduction.parser.Parser;
+import deduction.parser.ParserException;
+import deduction.presenter.ConsolePresenter;
+import deduction.presenter.Presenter;
 import deduction.txt.TxtParser;
 import deduction.db.DbWriter;
 import deduction.txt.TxtWriter;

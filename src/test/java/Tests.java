@@ -172,7 +172,7 @@ public class Tests extends Assert {
     public void test221() throws Exception {                           // ошибка в правилах - пустая линия
 
         File s = new File(getClass().getResource("wrong_fact_space.txt").getFile());
-        Main.main(new String[]{"deduce", "-txtin", s.getAbsolutePath()});
+        Main.main(new String[]{"-deduce", "-txtin", s.getAbsolutePath()});
 
         assertEquals("Error in line 4: invalid rule syntax", outContent.toString());
     }
