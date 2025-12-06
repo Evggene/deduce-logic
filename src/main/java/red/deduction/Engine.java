@@ -21,7 +21,7 @@ public class Engine {
     public enum FormatEnum {
         TXT, XML, DB
     }
-    private Presenter presenter;
+    private final Presenter presenter;
     private String configFileName;
 
     public Engine(Presenter presenter) {
@@ -98,29 +98,19 @@ public class Engine {
     }
 
     private Parser createParser(FormatEnum fmt) throws Exception {
-        switch (fmt) {
-            case TXT:
-                return new TxtParser();
-            case XML:
-                return new XmlParser();
-            case DB:
-                return new DbParser(configFileName);
-            default:
-                throw new Exception("Unknown parser format");
-        }
+        return switch (fmt) {
+            case TXT -> new TxtParser();
+            case XML -> new XmlParser();
+            case DB -> new DbParser(configFileName);
+        };
     }
 
     private Writer createWriter(FormatEnum fmt) throws Exception {
-        switch (fmt) {
-            case TXT:
-                return new TxtWriter();
-            case XML:
-                return new XmlWriter();
-            case DB:
-                return new DbWriter(configFileName);
-            default:
-                throw new Exception("Unknown parser format");
-        }
+        return switch (fmt) {
+            case TXT -> new TxtWriter();
+            case XML -> new XmlWriter();
+            case DB -> new DbWriter(configFileName);
+        };
     }
 }
 

@@ -1,5 +1,6 @@
 package red.deduction.txt;
 
+import lombok.SneakyThrows;
 import red.deduction.SerializerException;
 import red.deduction.model.*;
 import red.deduction.Writer;

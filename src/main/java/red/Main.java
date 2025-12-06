@@ -2,6 +2,8 @@ package red;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 //https://github.com/EvgenyBezlepkin/deduceLogicStatement-app.git
 @SpringBootApplication

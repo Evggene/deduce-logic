@@ -1,5 +1,6 @@
 package red.deduction.db;
 
+import lombok.SneakyThrows;
 import red.deduction.SerializerException;
 import red.deduction.Writer;
 import red.deduction.db.dto.*;
